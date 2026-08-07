@@ -1,0 +1,15 @@
+---
+description: Force Laravel 13 APIs and patterns when building features
+alwaysApply: true
+---
+
+# Laravel 13 Only
+
+This application runs **Laravel 13** (`laravel/framework` ^13, currently 13.x).
+
+When building or changing features:
+
+- Use **only Laravel 13** APIs, Artisan generators, scaffolding, config layout, and docs.
+- Do **not** use Laravel 10/11/12-only patterns, removed helpers, old directory layouts, or outdated training defaults.
+- Before writing version-sensitive code, confirm with Boost `search-docs` or the installed framework (`composer show laravel/framework`, source under `vendor/laravel/framework`).
+- Prefer modern Laravel 13 conventions already used in this app (e.g. `bootstrap/app.php` style, `casts()` method, anonymous migrations) over legacy equivalents.

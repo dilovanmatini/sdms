@@ -1,0 +1,22 @@
+---
+description: Force Flowbite React UI and Lucide icons in frontend work
+globs: resources/js/**/*.{tsx,ts,jsx,js}
+alwaysApply: false
+---
+
+# Frontend: Flowbite React + Lucide
+
+## UI components (Flowbite React)
+
+- Use **Flowbite React** for UI components and patterns in `resources/js`.
+- Canonical docs for agents: [flowbite-react.com/llms-full.txt](https://flowbite-react.com/llms-full.txt)
+- Prefer Flowbite React primitives (Modal, Table, Button, Badge, Card, Alert, Dropdown, Tabs, Sidebar, Navbar, Select, TextInput, Textarea, Checkbox, ToggleSwitch, Pagination, Tooltip, Accordion, etc.) before custom components.
+- Do **not** add new shadcn/Radix UI for new feature work unless extending an existing local wrapper that already depends on it.
+- Style with Tailwind utility classes; keep mobile-first responsive layouts.
+
+## Icons (Lucide)
+
+- Use **`lucide-react` only** for icons.
+- Choose icons from [lucide.dev/icons](https://lucide.dev/icons/).
+- Import named icons: `import { Search } from 'lucide-react'`.
+- Do **not** add Heroicons, Font Awesome, `react-icons`, or other icon libraries for new work.
