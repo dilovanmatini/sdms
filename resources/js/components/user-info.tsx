@@ -1,32 +1,43 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar } from 'flowbite-react';
 import { useInitials } from '@/hooks/use-initials';
+import { cn } from '@/lib/utils';
 import type { User } from '@/types';
 
 export function UserInfo({
     user,
     showEmail = false,
+    showName = true,
+    className,
 }: {
     user: User;
     showEmail?: boolean;
+    showName?: boolean;
+    className?: string;
 }) {
     const getInitials = useInitials();
 
     return (
-        <>
-            <Avatar className="h-8 w-8 overflow-hidden rounded-full">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-                    {getInitials(user.name)}
-                </AvatarFallback>
-            </Avatar>
-            <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-                {showEmail && (
-                    <span className="truncate text-xs text-muted-foreground">
-                        {user.email}
+        <div className={cn('flex min-w-0 items-center gap-2', className)}>
+            <Avatar
+                img={user.avatar || undefined}
+                placeholderInitials={getInitials(user.name)}
+                rounded
+                size="sm"
+                className="shrink-0"
+                aria-hidden={showName}
+            />
+            {showName && (
+                <div className="grid min-w-0 text-start text-sm leading-tight">
+                    <span className="truncate font-medium text-gray-900 dark:text-white">
+                        {user.name}
                     </span>
-                )}
-            </div>
-        </>
+                    {showEmail && (
+                        <span className="truncate text-xs text-gray-500 dark:text-gray-400">
+                            {user.username}
+                        </span>
+                    )}
+                </div>
+            )}
+        </div>
     );
 }

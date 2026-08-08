@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\SystemSetting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -35,11 +36,19 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        $settings = SystemSetting::current();
+
         return [
             ...parent::share($request),
-            'name' => config('app.name'),
+            'name' => $settings->app_name,
+            'logoUrl' => $settings->logo_url,
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user === null ? null : [
+                    ...$user->toArray(),
+                    'role' => $user->role->value,
+                    'abilities' => $user->abilityValues(),
+                ],
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

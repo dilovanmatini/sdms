@@ -11,7 +11,7 @@ alwaysApply: false
 - Use **Flowbite React** for UI components and patterns in `resources/js`.
 - Canonical docs for agents: [flowbite-react.com/llms-full.txt](https://flowbite-react.com/llms-full.txt)
 - Prefer Flowbite React primitives (Modal, Table, Button, Badge, Card, Alert, Dropdown, Tabs, Sidebar, Navbar, Select, TextInput, Textarea, Checkbox, ToggleSwitch, Pagination, Tooltip, Accordion, etc.) before custom components.
-- Do **not** add new shadcn/Radix UI for new feature work unless extending an existing local wrapper that already depends on it.
+- shadcn/Radix UI has been removed. Do **not** reintroduce shadcn, Radix UI, or `@/components/ui`.
 - Style with Tailwind utility classes; keep mobile-first responsive layouts.
 
 ## Icons (Lucide)

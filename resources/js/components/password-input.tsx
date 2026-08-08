@@ -1,7 +1,7 @@
+import { TextInput } from 'flowbite-react';
 import { Eye, EyeOff } from 'lucide-react';
 import type { ComponentProps, Ref } from 'react';
 import { useState } from 'react';
-import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
 export default function PasswordInput({
@@ -12,18 +12,20 @@ export default function PasswordInput({
     const [showPassword, setShowPassword] = useState(false);
 
     return (
-        <div className="relative">
-            <Input
+        <div className="relative [&_input]:pe-10">
+            <TextInput
                 type={showPassword ? 'text' : 'password'}
-                className={cn('pr-10', className)}
+                className={cn(className)}
                 ref={ref}
                 {...props}
             />
             <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-3 text-muted-foreground hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="absolute inset-y-0 end-0 flex items-center rounded-e-lg px-3 text-gray-500 hover:text-gray-900 focus:outline-none dark:text-gray-400 dark:hover:text-white"
+                aria-label={
+                    showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'
+                }
                 tabIndex={-1}
             >
                 {showPassword ? (

@@ -1,58 +1,48 @@
 import { Form } from '@inertiajs/react';
-import { useRef } from 'react';
+import { Button, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'flowbite-react';
+import { useRef, useState } from 'react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
-import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
+    const [open, setOpen] = useState(false);
 
     return (
         <div className="space-y-6">
             <Heading
                 variant="small"
-                title="Delete account"
-                description="Delete your account and all of its resources"
+                title="منطقة الخطر"
+                description="حذف حسابك وجميع موارده"
             />
             <div className="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10">
                 <div className="relative space-y-0.5 text-red-600 dark:text-red-100">
-                    <p className="font-medium">Warning</p>
+                    <p className="font-medium">تحذير</p>
                     <p className="text-sm">
-                        Please proceed with caution, this cannot be undone.
+                        يُرجى المتابعة بحذر، لا يمكن التراجع عن هذا الإجراء.
                     </p>
                 </div>
 
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button
-                            variant="destructive"
-                            data-test="delete-user-button"
-                        >
-                            Delete account
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogTitle>
-                            Are you sure you want to delete your account?
-                        </DialogTitle>
-                        <DialogDescription>
-                            Once your account is deleted, all of its resources
-                            and data will also be permanently deleted. Please
-                            enter your password to confirm you would like to
-                            permanently delete your account.
-                        </DialogDescription>
+                <Button
+                    color="failure"
+                    data-test="delete-user-button"
+                    onClick={() => setOpen(true)}
+                >
+                    حذف الحساب
+                </Button>
+
+                <Modal show={open} onClose={() => setOpen(false)} dismissible>
+                    <ModalHeader>
+                        هل أنت متأكد أنك تريد حذف حسابك؟
+                    </ModalHeader>
+                    <ModalBody>
+                        <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
+                            بمجرد حذف حسابك، سيتم حذف جميع موارده وبياناته بشكل
+                            دائم. يُرجى إدخال كلمة المرور لتأكيد رغبتك في حذف
+                            حسابك نهائياً.
+                        </p>
 
                         <Form
                             {...ProfileController.destroy.form()}
@@ -70,50 +60,46 @@ export default function DeleteUser() {
                                             htmlFor="password"
                                             className="sr-only"
                                         >
-                                            Password
+                                            كلمة المرور
                                         </Label>
 
                                         <PasswordInput
                                             id="password"
                                             name="password"
                                             ref={passwordInput}
-                                            placeholder="Password"
+                                            placeholder="كلمة المرور"
                                             autoComplete="current-password"
                                         />
 
                                         <InputError message={errors.password} />
                                     </div>
 
-                                    <DialogFooter className="gap-2">
-                                        <DialogClose asChild>
-                                            <Button
-                                                variant="secondary"
-                                                onClick={() =>
-                                                    resetAndClearErrors()
-                                                }
-                                            >
-                                                Cancel
-                                            </Button>
-                                        </DialogClose>
+                                    <ModalFooter className="justify-end gap-2 px-0">
+                                        <Button
+                                            color="light"
+                                            type="button"
+                                            onClick={() => {
+                                                resetAndClearErrors();
+                                                setOpen(false);
+                                            }}
+                                        >
+                                            إلغاء
+                                        </Button>
 
                                         <Button
-                                            variant="destructive"
+                                            color="failure"
+                                            type="submit"
                                             disabled={processing}
-                                            asChild
+                                            data-test="confirm-delete-user-button"
                                         >
-                                            <button
-                                                type="submit"
-                                                data-test="confirm-delete-user-button"
-                                            >
-                                                Delete account
-                                            </button>
+                                            حذف الحساب
                                         </Button>
-                                    </DialogFooter>
+                                    </ModalFooter>
                                 </>
                             )}
                         </Form>
-                    </DialogContent>
-                </Dialog>
+                    </ModalBody>
+                </Modal>
             </div>
         </div>
     );

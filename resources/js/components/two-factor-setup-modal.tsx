@@ -1,23 +1,16 @@
 import { Form } from '@inertiajs/react';
-import { REGEXP_ONLY_DIGITS } from 'input-otp';
+import {
+    Button,
+    Modal,
+    ModalBody,
+    ModalHeader,
+    Spinner,
+    TextInput,
+} from 'flowbite-react';
 import { Check, Copy, ScanLine } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import AlertError from '@/components/alert-error';
 import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
-import {
-    InputOTP,
-    InputOTPGroup,
-    InputOTPSlot,
-} from '@/components/ui/input-otp';
-import { Spinner } from '@/components/ui/spinner';
 import { useAppearance } from '@/hooks/use-appearance';
 import { useClipboard } from '@/hooks/use-clipboard';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
@@ -25,13 +18,13 @@ import { confirm } from '@/routes/two-factor';
 
 function GridScanIcon() {
     return (
-        <div className="mb-3 rounded-full border border-border bg-card p-0.5 shadow-sm">
-            <div className="relative overflow-hidden rounded-full border border-border bg-muted p-2.5">
+        <div className="mb-3 rounded-full border border-gray-200 bg-white p-0.5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+            <div className="relative overflow-hidden rounded-full border border-gray-200 bg-gray-100 p-2.5 dark:border-gray-700 dark:bg-gray-700">
                 <div className="absolute inset-0 grid grid-cols-5 opacity-50">
                     {Array.from({ length: 5 }, (_, i) => (
                         <div
                             key={`col-${i + 1}`}
-                            className="border-r border-border last:border-r-0"
+                            className="border-e border-gray-200 last:border-e-0 dark:border-gray-600"
                         />
                     ))}
                 </div>
@@ -39,11 +32,11 @@ function GridScanIcon() {
                     {Array.from({ length: 5 }, (_, i) => (
                         <div
                             key={`row-${i + 1}`}
-                            className="border-b border-border last:border-b-0"
+                            className="border-b border-gray-200 last:border-b-0 dark:border-gray-600"
                         />
                     ))}
                 </div>
-                <ScanLine className="relative z-20 size-6 text-foreground" />
+                <ScanLine className="relative z-20 size-6 text-gray-900 dark:text-white" />
             </div>
         </div>
     );
@@ -73,7 +66,7 @@ function TwoFactorSetupStep({
             ) : (
                 <>
                     <div className="mx-auto flex max-w-md overflow-hidden">
-                        <div className="mx-auto aspect-square w-64 rounded-lg border border-border">
+                        <div className="mx-auto aspect-square w-64 rounded-lg border border-gray-200 dark:border-gray-700">
                             <div className="z-10 flex h-full w-full items-center justify-center p-5">
                                 {qrCodeSvg ? (
                                     <div
@@ -95,23 +88,23 @@ function TwoFactorSetupStep({
                         </div>
                     </div>
 
-                    <div className="flex w-full space-x-5">
+                    <div className="flex w-full gap-5">
                         <Button className="w-full" onClick={onNextStep}>
                             {buttonText}
                         </Button>
                     </div>
 
                     <div className="relative flex w-full items-center justify-center">
-                        <div className="absolute inset-0 top-1/2 h-px w-full bg-border" />
-                        <span className="relative bg-card px-2 py-1">
-                            or, enter the code manually
+                        <div className="absolute inset-0 top-1/2 h-px w-full bg-gray-200 dark:bg-gray-700" />
+                        <span className="relative bg-white px-2 py-1 text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                            أو أدخل الرمز يدوياً
                         </span>
                     </div>
 
-                    <div className="flex w-full space-x-2">
-                        <div className="flex w-full items-stretch overflow-hidden rounded-xl border border-border">
+                    <div className="flex w-full gap-2">
+                        <div className="flex w-full items-stretch overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700">
                             {!manualSetupKey ? (
-                                <div className="flex h-full w-full items-center justify-center bg-muted p-3">
+                                <div className="flex h-full w-full items-center justify-center bg-gray-100 p-3 dark:bg-gray-700">
                                     <Spinner />
                                 </div>
                             ) : (
@@ -120,11 +113,12 @@ function TwoFactorSetupStep({
                                         type="text"
                                         readOnly
                                         value={manualSetupKey}
-                                        className="h-full w-full bg-background p-3 text-foreground outline-none"
+                                        className="h-full w-full bg-white p-3 text-gray-900 outline-none dark:bg-gray-800 dark:text-white"
                                     />
                                     <button
+                                        type="button"
                                         onClick={() => copy(manualSetupKey)}
-                                        className="border-l border-border px-3 hover:bg-muted"
+                                        className="border-s border-gray-200 px-3 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-700"
                                     >
                                         <IconComponent className="w-4" />
                                     </button>
@@ -174,27 +168,24 @@ function TwoFactorVerificationStep({
                         className="relative w-full space-y-3"
                     >
                         <div className="flex w-full flex-col items-center space-y-3 py-2">
-                            <InputOTP
+                            <TextInput
                                 id="otp"
                                 name="code"
+                                type="text"
+                                inputMode="numeric"
+                                autoComplete="one-time-code"
                                 maxLength={OTP_MAX_LENGTH}
-                                onChange={setCode}
+                                value={code}
+                                onChange={(event) =>
+                                    setCode(
+                                        event.target.value.replace(/\D/g, ''),
+                                    )
+                                }
                                 disabled={processing}
-                                pattern={REGEXP_ONLY_DIGITS}
                                 autoFocus
-                            >
-                                <InputOTPGroup>
-                                    {Array.from(
-                                        { length: OTP_MAX_LENGTH },
-                                        (_, index) => (
-                                            <InputOTPSlot
-                                                key={index}
-                                                index={index}
-                                            />
-                                        ),
-                                    )}
-                                </InputOTPGroup>
-                            </InputOTP>
+                                className="w-48 text-center text-lg tracking-[0.35em]"
+                                placeholder="000000"
+                            />
                             <InputError
                                 message={
                                     errors?.confirmTwoFactorAuthentication?.code
@@ -202,15 +193,15 @@ function TwoFactorVerificationStep({
                             />
                         </div>
 
-                        <div className="flex w-full space-x-5">
+                        <div className="flex w-full gap-5">
                             <Button
                                 type="button"
-                                variant="outline"
+                                color="light"
                                 className="flex-1"
                                 onClick={onBack}
                                 disabled={processing}
                             >
-                                Back
+                                رجوع
                             </Button>
                             <Button
                                 type="submit"
@@ -219,7 +210,7 @@ function TwoFactorVerificationStep({
                                     processing || code.length < OTP_MAX_LENGTH
                                 }
                             >
-                                Confirm
+                                تأكيد
                             </Button>
                         </div>
                     </div>
@@ -262,27 +253,26 @@ export default function TwoFactorSetupModal({
     }>(() => {
         if (twoFactorEnabled) {
             return {
-                title: 'Two-factor authentication enabled',
+                title: 'تم تفعيل المصادقة الثنائية',
                 description:
-                    'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.',
-                buttonText: 'Close',
+                    'تم تفعيل المصادقة الثنائية الآن. امسح رمز QR أو أدخل مفتاح الإعداد في تطبيق المصادقة.',
+                buttonText: 'إغلاق',
             };
         }
 
         if (showVerificationStep) {
             return {
-                title: 'Verify authentication code',
-                description:
-                    'Enter the 6-digit code from your authenticator app',
-                buttonText: 'Continue',
+                title: 'التحقق من رمز المصادقة',
+                description: 'أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة',
+                buttonText: 'متابعة',
             };
         }
 
         return {
-            title: 'Enable two-factor authentication',
+            title: 'تفعيل المصادقة الثنائية',
             description:
-                'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app',
-            buttonText: 'Continue',
+                'لإكمال تفعيل المصادقة الثنائية، امسح رمز QR أو أدخل مفتاح الإعداد في تطبيق المصادقة',
+            buttonText: 'متابعة',
         };
     }, [twoFactorEnabled, showVerificationStep]);
 
@@ -323,15 +313,17 @@ export default function TwoFactorSetupModal({
     }, [isOpen, qrCodeSvg]);
 
     return (
-        <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader className="flex items-center justify-center">
+        <Modal show={isOpen} onClose={handleClose} size="md" dismissible>
+            <ModalHeader>
+                <div className="flex w-full flex-col items-center text-center">
                     <GridScanIcon />
-                    <DialogTitle>{modalConfig.title}</DialogTitle>
-                    <DialogDescription className="text-center">
-                        {modalConfig.description}
-                    </DialogDescription>
-                </DialogHeader>
+                    <span>{modalConfig.title}</span>
+                </div>
+            </ModalHeader>
+            <ModalBody>
+                <p className="mb-5 text-center text-sm text-gray-500 dark:text-gray-400">
+                    {modalConfig.description}
+                </p>
 
                 <div className="flex flex-col items-center space-y-5">
                     {showVerificationStep ? (
@@ -349,7 +341,7 @@ export default function TwoFactorSetupModal({
                         />
                     )}
                 </div>
-            </DialogContent>
-        </Dialog>
+            </ModalBody>
+        </Modal>
     );
 }

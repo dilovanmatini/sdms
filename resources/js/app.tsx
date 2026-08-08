@@ -1,23 +1,40 @@
 import { createInertiaApp } from '@inertiajs/react';
-import { Toaster } from '@/components/ui/sonner';
-import { TooltipProvider } from '@/components/ui/tooltip';
+import { ThemeProvider } from 'flowbite-react';
+import { FlashToaster } from '@/components/flash-toaster';
 import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
-import SettingsLayout from '@/layouts/settings/layout';
+import SystemSettingsLayout from '@/layouts/settings/system-layout';
+import UserSettingsLayout from '@/layouts/settings/user-layout';
+import { flowbiteTheme } from '@/theme/flowbite';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const userSettingsPages = new Set([
+    'settings/profile',
+    'settings/security',
+    'settings/appearance',
+]);
 
 createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
+    title: (title, page) => {
+        const name =
+            typeof page.props.name === 'string' && page.props.name !== ''
+                ? page.props.name
+                : 'SDMS';
+
+        return title ? `${title} - ${name}` : name;
+    },
     layout: (name) => {
         switch (true) {
             case name === 'welcome':
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
+            case name === 'settings/index':
+                return AppLayout;
+            case userSettingsPages.has(name):
+                return [AppLayout, UserSettingsLayout];
             case name.startsWith('settings/'):
-                return [AppLayout, SettingsLayout];
+                return [AppLayout, SystemSettingsLayout];
             default:
                 return AppLayout;
         }
@@ -25,14 +42,98 @@ createInertiaApp({
     strictMode: true,
     withApp(app) {
         return (
-            <TooltipProvider delayDuration={0}>
+            <ThemeProvider
+                theme={flowbiteTheme}
+                applyTheme={{
+                    alert: {
+                        closeButton: { base: 'replace' },
+                        icon: 'replace',
+                    },
+                    breadcrumb: {
+                        item: {
+                            chevron: 'replace',
+                            icon: 'replace',
+                        },
+                    },
+                    dropdown: {
+                        arrowIcon: 'replace',
+                        inlineWrapper: 'replace',
+                        floating: {
+                            base: 'replace',
+                            header: 'replace',
+                            item: {
+                                base: 'replace',
+                                icon: 'replace',
+                            },
+                        },
+                    },
+                    avatar: {
+                        root: {
+                            base: 'replace',
+                        },
+                    },
+                    select: {
+                        addon: 'replace',
+                        field: {
+                            icon: { base: 'replace' },
+                            select: {
+                                base: 'replace',
+                                withIcon: 'replace',
+                                withAddon: 'replace',
+                            },
+                        },
+                    },
+                    sidebar: {
+                        root: {
+                            base: 'replace',
+                            collapsed: 'replace',
+                            inner: 'replace',
+                        },
+                        collapse: {
+                            icon: { base: 'replace' },
+                            label: { base: 'replace' },
+                        },
+                        item: {
+                            base: 'replace',
+                            collapsed: { insideCollapse: 'replace' },
+                            content: { base: 'replace' },
+                            icon: {
+                                base: 'replace',
+                                active: 'replace',
+                            },
+                        },
+                        itemGroup: {
+                            base: 'replace',
+                        },
+                        logo: {
+                            base: 'replace',
+                            img: 'replace',
+                        },
+                    },
+                    textInput: {
+                        addon: 'replace',
+                        field: {
+                            icon: { base: 'replace' },
+                            rightIcon: { base: 'replace' },
+                            input: {
+                                withRightIcon: 'replace',
+                                withIcon: 'replace',
+                                withAddon: 'replace',
+                            },
+                        },
+                    },
+                    toast: {
+                        toggle: { base: 'replace' },
+                    },
+                }}
+            >
                 {app}
-                <Toaster />
-            </TooltipProvider>
+                <FlashToaster />
+            </ThemeProvider>
         );
     },
     progress: {
-        color: '#4B5563',
+        color: '#2563eb',
     },
 });
 

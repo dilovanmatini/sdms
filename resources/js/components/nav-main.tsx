@@ -1,36 +1,110 @@
 import { Link } from '@inertiajs/react';
-import {
-    SidebarGroup,
-    SidebarGroupLabel,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from '@/components/ui/sidebar';
+import { SidebarItem, SidebarItemGroup, SidebarItems } from 'flowbite-react';
+import type { ComponentProps, FC } from 'react';
 import { useCurrentUrl } from '@/hooks/use-current-url';
+import { toUrl } from '@/lib/utils';
+import { dashboard } from '@/routes';
+import { index as settingsIndex } from '@/routes/settings';
 import type { NavItem } from '@/types';
 
-export function NavMain({ items = [] }: { items: NavItem[] }) {
-    const { isCurrentUrl } = useCurrentUrl();
+export type NavItemWithAbility = NavItem & {
+    ability?: string;
+};
+
+export type NavGroup = {
+    title: string;
+    items: NavItemWithAbility[];
+};
+
+const userSettingsPrefixes = [
+    '/settings/profile',
+    '/settings/security',
+    '/settings/appearance',
+    '/settings/password',
+];
+
+function isUserSettingsPath(path: string): boolean {
+    return userSettingsPrefixes.some(
+        (prefix) => path === prefix || path.startsWith(`${prefix}/`),
+    );
+}
+
+function isSystemSettingsPath(path: string): boolean {
+    if (!path.startsWith('/settings')) {
+        return false;
+    }
+
+    return !isUserSettingsPath(path);
+}
+
+function isItemActive(
+    item: NavItemWithAbility,
+    currentUrl: string,
+    isCurrentUrl: ReturnType<typeof useCurrentUrl>['isCurrentUrl'],
+): boolean {
+    const href = toUrl(item.href);
+    const dashboardUrl = toUrl(dashboard());
+
+    if (href === dashboardUrl) {
+        return item.ability === 'view_dashboard' && isCurrentUrl(dashboard());
+    }
+
+    if (href === toUrl(settingsIndex())) {
+        return isSystemSettingsPath(currentUrl);
+    }
+
+    return isCurrentUrl(item.href);
+}
+
+export function NavMain({
+    groups = [],
+    collapsed = false,
+    onNavigate,
+}: {
+    groups: NavGroup[];
+    collapsed?: boolean;
+    onNavigate?: () => void;
+}) {
+    const { currentUrl, isCurrentUrl } = useCurrentUrl();
+
+    const visibleGroups = groups.filter((group) => group.items.length > 0);
 
     return (
-        <SidebarGroup className="px-2 py-0">
-            <SidebarGroupLabel>Platform</SidebarGroupLabel>
-            <SidebarMenu>
-                {items.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton
-                            asChild
-                            isActive={isCurrentUrl(item.href)}
-                            tooltip={{ children: item.title }}
-                        >
-                            <Link href={item.href} prefetch>
-                                {item.icon && <item.icon />}
-                                <span>{item.title}</span>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                ))}
-            </SidebarMenu>
-        </SidebarGroup>
+        <SidebarItems>
+            {visibleGroups.map((group) => (
+                <SidebarItemGroup key={group.title}>
+                    {!collapsed && (
+                        <li className="mb-0.5 list-none px-2">
+                            <p className="text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400">
+                                {group.title}
+                            </p>
+                        </li>
+                    )}
+                    {group.items.map((item) => {
+                        const icon = item.icon as
+                            | FC<ComponentProps<'svg'>>
+                            | undefined;
+                        const href = toUrl(item.href);
+
+                        return (
+                            <SidebarItem
+                                key={item.title}
+                                as={Link}
+                                href={href}
+                                icon={icon}
+                                active={isItemActive(
+                                    item,
+                                    currentUrl,
+                                    isCurrentUrl,
+                                )}
+                                onClick={onNavigate}
+                            >
+                                {item.title}
+                            </SidebarItem>
+                        );
+                    })}
+                </SidebarItemGroup>
+            ))}
+        </SidebarItems>
     );
 }

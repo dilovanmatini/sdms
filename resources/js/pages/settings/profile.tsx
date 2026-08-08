@@ -1,11 +1,9 @@
 import { Form, Head, usePage } from '@inertiajs/react';
+import { Button, Label, TextInput } from 'flowbite-react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import DeleteUser from '@/components/delete-user';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { edit } from '@/routes/profile';
 import type { Auth } from '@/types';
 
@@ -18,15 +16,15 @@ export default function Profile() {
 
     return (
         <>
-            <Head title="Profile settings" />
+            <Head title="إعدادات الملف الشخصي" />
 
-            <h1 className="sr-only">Profile settings</h1>
+            <h1 className="sr-only">إعدادات الملف الشخصي</h1>
 
             <div className="space-y-6">
                 <Heading
                     variant="small"
-                    title="Profile"
-                    description="Update your name and email address"
+                    title="الملف الشخصي"
+                    description="تحديث الاسم والبريد الإلكتروني"
                 />
 
                 <Form
@@ -39,16 +37,16 @@ export default function Profile() {
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
+                                <Label htmlFor="name">الاسم الكامل</Label>
 
-                                <Input
+                                <TextInput
                                     id="name"
                                     className="mt-1 block w-full"
                                     defaultValue={auth.user.name}
                                     name="name"
                                     required
                                     autoComplete="name"
-                                    placeholder="Full name"
+                                    placeholder="الاسم الكامل"
                                 />
 
                                 <InputError
@@ -58,17 +56,31 @@ export default function Profile() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Label htmlFor="username">اسم المستخدم</Label>
 
-                                <Input
+                                <TextInput
+                                    id="username"
+                                    className="mt-1 block w-full"
+                                    defaultValue={auth.user.username}
+                                    name="username"
+                                    disabled
+                                    autoComplete="username"
+                                />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="email">
+                                    البريد الإلكتروني (اختياري)
+                                </Label>
+
+                                <TextInput
                                     id="email"
                                     type="email"
                                     className="mt-1 block w-full"
-                                    defaultValue={auth.user.email}
+                                    defaultValue={auth.user.email ?? ''}
                                     name="email"
-                                    required
-                                    autoComplete="username"
-                                    placeholder="Email address"
+                                    autoComplete="email"
+                                    placeholder="البريد الإلكتروني"
                                 />
 
                                 <InputError
@@ -82,7 +94,7 @@ export default function Profile() {
                                     disabled={processing}
                                     data-test="update-profile-button"
                                 >
-                                    Save
+                                    حفظ
                                 </Button>
                             </div>
                         </>
@@ -98,7 +110,7 @@ export default function Profile() {
 Profile.layout = {
     breadcrumbs: [
         {
-            title: 'Profile settings',
+            title: 'إعدادات الملف الشخصي',
             href: edit(),
         },
     ],

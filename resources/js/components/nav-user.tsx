@@ -1,58 +1,44 @@
 import { usePage } from '@inertiajs/react';
+import { Dropdown } from 'flowbite-react';
 import { ChevronsUpDown } from 'lucide-react';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    useSidebar,
-} from '@/components/ui/sidebar';
 import { UserInfo } from '@/components/user-info';
 import { UserMenuContent } from '@/components/user-menu-content';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 
-export function NavUser() {
+export function NavUser({ collapsed = false }: { collapsed?: boolean }) {
     const { auth } = usePage().props;
-    const { state } = useSidebar();
-    const isMobile = useIsMobile();
 
     if (!auth.user) {
         return null;
     }
 
     return (
-        <SidebarMenu>
-            <SidebarMenuItem>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <SidebarMenuButton
-                            size="lg"
-                            className="group text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent"
-                            data-test="sidebar-menu-button"
-                        >
-                            <UserInfo user={auth.user} />
-                            <ChevronsUpDown className="ml-auto size-4" />
-                        </SidebarMenuButton>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                        className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-                        align="end"
-                        side={
-                            isMobile
-                                ? 'bottom'
-                                : state === 'collapsed'
-                                  ? 'left'
-                                  : 'bottom'
-                        }
-                    >
-                        <UserMenuContent user={auth.user} />
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </SidebarMenuItem>
-        </SidebarMenu>
+        <Dropdown
+            inline
+            arrowIcon={false}
+            placement={collapsed ? 'left' : 'top'}
+            className="min-w-56"
+            label={
+                <div
+                    className={cn(
+                        'flex w-full items-center rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-700',
+                        collapsed ? 'justify-center' : 'gap-2',
+                    )}
+                    data-test="sidebar-menu-button"
+                >
+                    <UserInfo
+                        user={auth.user}
+                        showEmail={false}
+                        showName={!collapsed}
+                        className={collapsed ? undefined : 'min-w-0 flex-1'}
+                    />
+                    {!collapsed && (
+                        <ChevronsUpDown className="ms-auto size-4 shrink-0 text-gray-500" />
+                    )}
+                </div>
+            }
+        >
+            <UserMenuContent user={auth.user} />
+        </Dropdown>
     );
 }

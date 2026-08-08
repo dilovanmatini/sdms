@@ -1,13 +1,7 @@
 import { Link } from '@inertiajs/react';
-import { Fragment } from 'react';
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+import { Breadcrumb, BreadcrumbItem } from 'flowbite-react';
+import { Home } from 'lucide-react';
+import { toUrl } from '@/lib/utils';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 
 export function Breadcrumbs({
@@ -15,36 +9,29 @@ export function Breadcrumbs({
 }: {
     breadcrumbs: BreadcrumbItemType[];
 }) {
-    return (
-        <>
-            {breadcrumbs.length > 0 && (
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        {breadcrumbs.map((item, index) => {
-                            const isLast = index === breadcrumbs.length - 1;
+    if (breadcrumbs.length === 0) {
+        return null;
+    }
 
-                            return (
-                                <Fragment key={index}>
-                                    <BreadcrumbItem>
-                                        {isLast ? (
-                                            <BreadcrumbPage>
-                                                {item.title}
-                                            </BreadcrumbPage>
-                                        ) : (
-                                            <BreadcrumbLink asChild>
-                                                <Link href={item.href}>
-                                                    {item.title}
-                                                </Link>
-                                            </BreadcrumbLink>
-                                        )}
-                                    </BreadcrumbItem>
-                                    {!isLast && <BreadcrumbSeparator />}
-                                </Fragment>
-                            );
-                        })}
-                    </BreadcrumbList>
-                </Breadcrumb>
-            )}
-        </>
+    return (
+        <Breadcrumb aria-label="مسار التنقل">
+            {breadcrumbs.map((item, index) => {
+                const isLast = index === breadcrumbs.length - 1;
+
+                return (
+                    <BreadcrumbItem
+                        key={`${item.title}-${index}`}
+                        href={isLast ? undefined : toUrl(item.href)}
+                        icon={index === 0 ? Home : undefined}
+                    >
+                        {isLast ? (
+                            item.title
+                        ) : (
+                            <Link href={item.href}>{item.title}</Link>
+                        )}
+                    </BreadcrumbItem>
+                );
+            })}
+        </Breadcrumb>
     );
 }
