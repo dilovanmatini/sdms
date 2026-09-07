@@ -72,6 +72,10 @@ createInertiaApp({
                             base: 'replace',
                         },
                     },
+                    button: {
+                        base: 'replace',
+                        disabled: 'replace',
+                    },
                     select: {
                         addon: 'replace',
                         field: {

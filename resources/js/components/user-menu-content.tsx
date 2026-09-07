@@ -1,5 +1,4 @@
 import { Link, router } from '@inertiajs/react';
-import { DropdownDivider, DropdownHeader, DropdownItem } from 'flowbite-react';
 import { LogOut, UserRound } from 'lucide-react';
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
@@ -10,38 +9,52 @@ import type { User } from '@/types';
 
 type Props = {
     user: User;
+    onNavigate?: () => void;
 };
 
-export function UserMenuContent({ user }: Props) {
+const itemClassName =
+    'flex w-full cursor-pointer items-center justify-start gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none dark:text-gray-200 dark:hover:bg-gray-600 dark:hover:text-white dark:focus:bg-gray-600 dark:focus:text-white';
+
+export function UserMenuContent({ user, onNavigate }: Props) {
     const cleanup = useMobileNavigation();
 
-    const handleLogout = () => {
+    const handleNavigate = () => {
         cleanup();
+        onNavigate?.();
+    };
+
+    const handleLogout = () => {
+        handleNavigate();
         router.flushAll();
         router.post(toUrl(logout()));
     };
 
     return (
         <>
-            <DropdownHeader>
+            <div className="block px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
                 <UserInfo user={user} showEmail={true} />
-            </DropdownHeader>
-            <DropdownItem
-                as={Link}
+            </div>
+            <div className="my-1 h-px bg-gray-100 dark:bg-gray-600" />
+            <Link
                 href={toUrl(editProfile())}
-                icon={UserRound}
-                onClick={cleanup}
+                role="menuitem"
+                className={itemClassName}
+                onClick={handleNavigate}
             >
+                <UserRound className="size-4 shrink-0 text-gray-500 dark:text-gray-400" />
                 إعدادات الحساب
-            </DropdownItem>
-            <DropdownDivider />
-            <DropdownItem
-                icon={LogOut}
+            </Link>
+            <div className="my-1 h-px bg-gray-100 dark:bg-gray-600" />
+            <button
+                type="button"
+                role="menuitem"
+                className={itemClassName}
                 onClick={handleLogout}
                 data-test="logout-button"
             >
+                <LogOut className="size-4 shrink-0 text-gray-500 dark:text-gray-400" />
                 تسجيل الخروج
-            </DropdownItem>
+            </button>
         </>
     );
 }

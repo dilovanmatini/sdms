@@ -13,14 +13,49 @@ test('administrator can manage categories', function () {
         ->assertOk();
 
     $this->actingAs($admin)
-        ->post(route('categories.store'), [
+        ->get(route('categories.create-edit'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('categories/create-edit')
+            ->where('category', null));
+
+    $this->actingAs($admin)
+        ->from(route('categories.create-edit'))
+        ->post(route('categories.store-update'), [
             'name' => 'مشروبات',
             'description' => 'وصف',
             'is_active' => true,
         ])
-        ->assertRedirect(route('categories.index'));
+        ->assertSessionHasNoErrors()
+        ->assertRedirect();
 
     $this->assertDatabaseHas('categories', ['name' => 'مشروبات']);
+
+    $category = Category::query()->where('name', 'مشروبات')->firstOrFail();
+
+    $this->actingAs($admin)
+        ->get(route('categories.create-edit', $category))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('categories/create-edit')
+            ->where('category.id', $category->id)
+            ->where('category.name', 'مشروبات'));
+
+    $this->actingAs($admin)
+        ->from(route('categories.create-edit', $category))
+        ->post(route('categories.store-update', $category), [
+            'name' => 'مشروبات محدثة',
+            'description' => 'وصف محدث',
+            'is_active' => false,
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('categories.create-edit', $category));
+
+    $this->assertDatabaseHas('categories', [
+        'id' => $category->id,
+        'name' => 'مشروبات محدثة',
+        'is_active' => false,
+    ]);
 });
 
 test('sales role cannot manage categories', function () {

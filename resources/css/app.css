@@ -30,6 +30,21 @@
     body {
         @apply bg-gray-50 text-gray-900 antialiased dark:bg-gray-900 dark:text-gray-100;
     }
+
+    button:not(:disabled),
+    [type='button']:not(:disabled),
+    [type='submit']:not(:disabled),
+    [type='reset']:not(:disabled),
+    a[role='button']:not([aria-disabled='true']) {
+        @apply cursor-pointer;
+    }
+
+    button:disabled,
+    [type='button']:disabled,
+    [type='submit']:disabled,
+    [type='reset']:disabled {
+        @apply cursor-not-allowed;
+    }
 }
 
 /*

@@ -1,7 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { Breadcrumb, BreadcrumbItem } from 'flowbite-react';
 import { Home } from 'lucide-react';
-import { toUrl } from '@/lib/utils';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 
 export function Breadcrumbs({
@@ -21,13 +20,17 @@ export function Breadcrumbs({
                 return (
                     <BreadcrumbItem
                         key={`${item.title}-${index}`}
-                        href={isLast ? undefined : toUrl(item.href)}
                         icon={index === 0 ? Home : undefined}
                     >
                         {isLast ? (
                             item.title
                         ) : (
-                            <Link href={item.href}>{item.title}</Link>
+                            <Link
+                                href={item.href}
+                                className="text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                            >
+                                {item.title}
+                            </Link>
                         )}
                     </BreadcrumbItem>
                 );

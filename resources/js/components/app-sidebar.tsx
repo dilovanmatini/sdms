@@ -256,14 +256,16 @@ export function AppSidebar() {
             <div className="flex min-h-0 flex-1 flex-col gap-2">
                 <div
                     className={cn(
-                        'flex items-center gap-1',
-                        collapsed && 'flex-col justify-center',
+                        'flex w-full items-center gap-1',
+                        collapsed
+                            ? 'flex-col justify-center'
+                            : 'justify-between',
                     )}
                 >
                     <Link
                         href={dashboard()}
                         prefetch
-                        className="flex min-w-0 items-center justify-center rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        className="flex min-w-0 items-center justify-start rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                         {collapsed ? (
                             <AppLogoIcon className="size-8" />
@@ -287,7 +289,7 @@ export function AppSidebar() {
                     <NavMain groups={mainNavGroups} collapsed={collapsed} />
                 </div>
 
-                <div className="mt-auto space-y-2 border-t border-gray-200 pt-2 dark:border-gray-700">
+                <div className="relative z-10 mt-auto space-y-2 border-t border-gray-200 pt-2 dark:border-gray-700">
                     <NavFooter items={footerNavItems} />
                     <NavUser collapsed={collapsed} />
                 </div>

@@ -8,7 +8,7 @@ import { createTheme } from 'flowbite-react';
 export const flowbiteTheme = createTheme({
     alert: {
         closeButton: {
-            base: '-m-1.5 ms-auto inline-flex h-8 w-8 rounded-lg p-1.5 focus:ring-2',
+            base: '-m-1.5 ms-auto inline-flex h-8 w-8 cursor-pointer rounded-lg p-1.5 focus:ring-2',
         },
         icon: 'me-3 inline h-5 w-5 shrink-0',
     },
@@ -19,9 +19,13 @@ export const flowbiteTheme = createTheme({
             icon: 'me-2 h-4 w-4',
         },
     },
+    button: {
+        base: 'relative flex cursor-pointer items-center justify-center rounded-lg text-center font-medium focus:outline-none focus:ring-4',
+        disabled: 'pointer-events-none cursor-not-allowed opacity-50',
+    },
     dropdown: {
         arrowIcon: 'ms-2 h-4 w-4',
-        inlineWrapper: 'flex w-full items-center',
+        inlineWrapper: 'flex w-full cursor-pointer items-center',
         floating: {
             base: 'z-10 w-fit min-w-56 divide-y divide-gray-100 rounded-lg shadow focus:outline-none',
             header: 'block px-4 py-3 text-sm text-gray-700 dark:text-gray-200',
@@ -44,7 +48,7 @@ export const flowbiteTheme = createTheme({
                 base: 'pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3',
             },
             select: {
-                base: 'block w-full appearance-none border bg-arrow-down-icon bg-[length:0.75em_0.75em] bg-[position:left_12px_center] bg-no-repeat pe-10 focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:opacity-50',
+                base: 'block w-full cursor-pointer appearance-none border bg-arrow-down-icon bg-[length:0.75em_0.75em] bg-[position:left_12px_center] bg-no-repeat pe-10 focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:opacity-50',
                 withIcon: {
                     on: 'ps-10',
                     off: '',
@@ -74,7 +78,7 @@ export const flowbiteTheme = createTheme({
             },
         },
         item: {
-            base: 'flex w-full items-center justify-start rounded-lg px-2 py-1.5 text-sm font-medium text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700',
+            base: 'flex w-full cursor-pointer items-center justify-start rounded-lg px-2 py-1.5 text-sm font-medium text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700',
             collapsed: {
                 insideCollapse: 'group w-full ps-8 transition duration-75',
             },
@@ -122,7 +126,7 @@ export const flowbiteTheme = createTheme({
     },
     toast: {
         toggle: {
-            base: '-m-1.5 ms-auto inline-flex h-8 w-8 rounded-lg bg-white p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-900 focus:ring-2 focus:ring-gray-300 dark:bg-gray-800 dark:text-gray-500 dark:hover:bg-gray-700 dark:hover:text-white',
+            base: '-m-1.5 ms-auto inline-flex h-8 w-8 cursor-pointer rounded-lg bg-white p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-900 focus:ring-2 focus:ring-gray-300 dark:bg-gray-800 dark:text-gray-500 dark:hover:bg-gray-700 dark:hover:text-white',
         },
     },
 });

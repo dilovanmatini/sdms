@@ -58,7 +58,6 @@ function isItemActive(
 
 export function NavMain({
     groups = [],
-    collapsed = false,
     onNavigate,
 }: {
     groups: NavGroup[];
@@ -73,13 +72,6 @@ export function NavMain({
         <SidebarItems>
             {visibleGroups.map((group) => (
                 <SidebarItemGroup key={group.title}>
-                    {!collapsed && (
-                        <li className="mb-0.5 list-none px-2">
-                            <p className="text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400">
-                                {group.title}
-                            </p>
-                        </li>
-                    )}
                     {group.items.map((item) => {
                         const icon = item.icon as
                             | FC<ComponentProps<'svg'>>

@@ -21,7 +21,13 @@ Route::middleware(['auth'])->group(function () {
 
     Route::redirect('users', '/settings/users');
 
-    Route::resource('categories', CategoryController::class)->except(['show']);
+    Route::group(['prefix' => 'categories'], function () {
+        Route::get('/', [CategoryController::class, 'index'])->name('categories.index');
+        Route::get('create-edit/{category?}', [CategoryController::class, 'createEdit'])->name('categories.create-edit');
+        Route::post('{category?}', [CategoryController::class, 'storeUpdate'])->name('categories.store-update');
+        Route::delete('{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+    });
+
     Route::resource('products', ProductController::class)->except(['show']);
     Route::resource('suppliers', SupplierController::class)->except(['show']);
     Route::resource('distributors', DistributorController::class)->except(['show']);

@@ -3,22 +3,21 @@
 namespace App\Http\Requests;
 
 use App\Models\Category;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateCategoryRequest extends FormRequest
+class StoreUpdateCategoryRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        /** @var Category $category */
         $category = $this->route('category');
 
-        return $this->user()?->can('update', $category) ?? false;
+        if ($category?->exists) {
+            return $this->user()?->can('update', $category) ?? false;
+        }
+
+        return $this->user()?->can('create', Category::class) ?? false;
     }
 
-    /**
-     * @return array<string, array<int, ValidationRule|string>>
-     */
     public function rules(): array
     {
         return [
@@ -28,9 +27,6 @@ class UpdateCategoryRequest extends FormRequest
         ];
     }
 
-    /**
-     * @return array<string, string>
-     */
     public function attributes(): array
     {
         return [

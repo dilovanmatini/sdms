@@ -2,17 +2,20 @@ import { router } from '@inertiajs/react';
 import { Label, TextInput } from 'flowbite-react';
 import { Search } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
+import { cn } from '@/lib/utils';
 
 type Props = {
     url: string;
     initial?: string;
     placeholder?: string;
+    className?: string;
 };
 
 export function SearchFilter({
     url,
     initial = '',
     placeholder = 'بحث...',
+    className,
 }: Props) {
     const [search, setSearch] = useState(initial);
 
@@ -26,7 +29,10 @@ export function SearchFilter({
     };
 
     return (
-        <form onSubmit={submit} className="flex max-w-md items-end gap-2">
+        <form
+            onSubmit={submit}
+            className={cn('flex w-full max-w-md items-end gap-2', className)}
+        >
             <div className="grow">
                 <Label htmlFor="search" className="sr-only">
                     بحث
