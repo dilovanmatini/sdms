@@ -4,7 +4,10 @@ import { AlertCircle, CheckCircle2, Info, TriangleAlert } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { FlashToast } from '@/types/ui';
 
-type ToastItem = FlashToast & { id: number };
+type ToastItem = FlashToast & { id: number; open: boolean };
+
+const TOAST_DURATION_MS = 4000;
+const TOAST_TRANSITION_MS = 300;
 
 const icons = {
     success: CheckCircle2,
@@ -34,27 +37,56 @@ export function FlashToaster() {
             }
 
             const id = Date.now();
-            setToasts((current) => [...current, { ...data, id }]);
+            setToasts((current) => [...current, { ...data, id, open: false }]);
+
+            window.requestAnimationFrame(() => {
+                window.requestAnimationFrame(() => {
+                    setToasts((current) =>
+                        current.map((toast) =>
+                            toast.id === id ? { ...toast, open: true } : toast,
+                        ),
+                    );
+                });
+            });
 
             window.setTimeout(() => {
-                setToasts((current) =>
-                    current.filter((toast) => toast.id !== id),
-                );
-            }, 4000);
+                dismissToast(id);
+            }, TOAST_DURATION_MS);
         });
     }, []);
+
+    function dismissToast(id: number): void {
+        setToasts((current) =>
+            current.map((toast) =>
+                toast.id === id ? { ...toast, open: false } : toast,
+            ),
+        );
+
+        window.setTimeout(() => {
+            setToasts((current) =>
+                current.filter((toast) => toast.id !== id),
+            );
+        }, TOAST_TRANSITION_MS);
+    }
 
     if (toasts.length === 0) {
         return null;
     }
 
     return (
-        <div className="fixed top-4 end-4 z-50 flex flex-col gap-3">
+        <div className="fixed bottom-4 end-4 z-50 flex flex-col gap-3">
             {toasts.map((toast) => {
                 const Icon = icons[toast.type];
 
                 return (
-                    <Toast key={toast.id} className="gap-3">
+                    <Toast
+                        key={toast.id}
+                        className={`gap-3 transition duration-300 ease-out ${
+                            toast.open
+                                ? 'translate-x-0 opacity-100'
+                                : 'opacity-0 ltr:translate-x-full rtl:-translate-x-full'
+                        }`}
+                    >
                         <div
                             className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${iconStyles[toast.type]}`}
                         >
@@ -63,15 +95,7 @@ export function FlashToaster() {
                         <div className="text-sm font-normal">
                             {toast.message}
                         </div>
-                        <ToastToggle
-                            onDismiss={() =>
-                                setToasts((current) =>
-                                    current.filter(
-                                        (item) => item.id !== toast.id,
-                                    ),
-                                )
-                            }
-                        />
+                        <ToastToggle onDismiss={() => dismissToast(toast.id)} />
                     </Toast>
                 );
             })}

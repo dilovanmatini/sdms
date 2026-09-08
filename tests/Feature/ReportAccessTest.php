@@ -15,7 +15,11 @@ test('manager can open reports hub and inventory report', function () {
         ->assertSuccessful()
         ->assertInertia(fn ($page) => $page
             ->component('reports/index')
-            ->has('reports'));
+            ->has('reports')
+            ->where('reports', fn ($reports) => collect($reports)->every(
+                fn ($report) => ($report['type'] ?? null) !== 'customer-statement'
+                    && ($report['title'] ?? null) !== 'كشف حساب العميل'
+            )));
 
     $this->actingAs($manager)
         ->get(route('reports.show', 'inventory'))

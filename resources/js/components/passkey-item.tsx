@@ -45,7 +45,7 @@ export default function PasskeyItem({ passkey, onDelete }: Props) {
             </div>
 
             <Button
-                color="failure"
+                color="red"
                 size="sm"
                 outline
                 onClick={() => setOpen(true)}
@@ -67,7 +67,7 @@ export default function PasskeyItem({ passkey, onDelete }: Props) {
                         إلغاء
                     </Button>
                     <Button
-                        color="failure"
+                        color="red"
                         onClick={handleDelete}
                         disabled={isDeleting}
                     >

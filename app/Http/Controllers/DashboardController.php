@@ -2,20 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Dashboard\ShowAction;
 use App\Authorization\Ability;
-use App\Services\DashboardMetrics;
 use Illuminate\Support\Facades\Gate;
-use Inertia\Inertia;
 use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function __invoke(DashboardMetrics $metrics): Response
+    public function __invoke(ShowAction $action): Response
     {
         Gate::authorize(Ability::ViewDashboard->value);
 
-        return Inertia::render('dashboard', [
-            'metrics' => $metrics->build(),
-        ]);
+        return $action->handle();
     }
 }

@@ -25,16 +25,21 @@ class PurchasePolicy
 
     public function update(User $user, Purchase $purchase): bool
     {
-        return $user->hasAbility(Ability::ManagePurchases) && ! $purchase->isPosted();
+        return $user->hasAbility(Ability::ManagePurchases) && $purchase->isDraft();
     }
 
     public function delete(User $user, Purchase $purchase): bool
     {
-        return $user->hasAbility(Ability::ManagePurchases) && ! $purchase->isPosted();
+        return $user->hasAbility(Ability::ManagePurchases) && $purchase->isDraft();
     }
 
     public function post(User $user, Purchase $purchase): bool
     {
-        return $user->hasAbility(Ability::ManagePurchases) && ! $purchase->isPosted();
+        return $user->hasAbility(Ability::ManagePurchases) && $purchase->isDraft();
+    }
+
+    public function cancel(User $user, Purchase $purchase): bool
+    {
+        return $user->hasAbility(Ability::ManagePurchases) && $purchase->isPosted();
     }
 }

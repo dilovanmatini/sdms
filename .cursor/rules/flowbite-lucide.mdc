@@ -11,6 +11,8 @@ alwaysApply: false
 - Use **Flowbite React** for UI components and patterns in `resources/js`.
 - Canonical docs for agents: [flowbite-react.com/llms-full.txt](https://flowbite-react.com/llms-full.txt)
 - Prefer Flowbite React primitives (Modal, Table, Button, Badge, Card, Alert, Dropdown, Tabs, Sidebar, Navbar, Select, TextInput, Textarea, Checkbox, ToggleSwitch, Pagination, Tooltip, Accordion, etc.) before custom components.
+- Soft focus: do not use thick `focus:ring-2`/`focus:ring-4`. Use `focus:ring-0` + `shadow-focus` (see `resources/css/app.css` / `theme/flowbite.ts`).
+- For option lists expected to exceed ~5 values, use `@/components/searchable-select` or `@/components/async-searchable-select` (AJAX `/lookups/*`). Do not add react-select. Keep plain `Select` only for short static enums. Database catalogs (products, distributors, suppliers, categories, units, open invoices) must use AJAX lookups — do not preload full lists into Inertia props.
 - shadcn/Radix UI has been removed. Do **not** reintroduce shadcn, Radix UI, or `@/components/ui`.
 - Style with Tailwind utility classes; keep mobile-first responsive layouts.
 

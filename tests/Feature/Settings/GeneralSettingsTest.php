@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Currency;
 use App\Enums\UserRole;
 use App\Models\SystemSetting;
 use App\Models\User;
@@ -15,7 +16,9 @@ test('administrator can view general settings', function () {
         ->assertInertia(fn ($page) => $page
             ->component('settings/general')
             ->has('settings.app_name')
-            ->where('settings.logo_url', null));
+            ->where('settings.currency', 'usd')
+            ->where('settings.logo_url', null)
+            ->has('currency_options', 2));
 });
 
 test('non administrator cannot view general settings', function () {
@@ -33,6 +36,7 @@ test('administrator can update general settings', function () {
         ->actingAs($admin)
         ->put(route('settings.general.update'), [
             'app_name' => 'شركة التوزيع',
+            'currency' => 'iqd',
             'invoice_header' => 'رأس الفاتورة',
             'invoice_footer' => 'تذييل الفاتورة',
             'receipt_header' => 'رأس السند',
@@ -46,6 +50,7 @@ test('administrator can update general settings', function () {
     $settings = SystemSetting::current();
 
     expect($settings->app_name)->toBe('شركة التوزيع')
+        ->and($settings->currency)->toBe(Currency::Iqd)
         ->and($settings->invoice_header)->toBe('رأس الفاتورة')
         ->and($settings->invoice_footer)->toBe('تذييل الفاتورة')
         ->and($settings->receipt_header)->toBe('رأس السند')
@@ -60,6 +65,7 @@ test('administrator can upload and remove a logo', function () {
     $this->actingAs($admin)
         ->put(route('settings.general.update'), [
             'app_name' => 'SDMS',
+            'currency' => 'usd',
             'logo' => UploadedFile::fake()->image('logo.png'),
         ])
         ->assertSessionHasNoErrors()
@@ -75,6 +81,7 @@ test('administrator can upload and remove a logo', function () {
     $this->actingAs($admin)
         ->put(route('settings.general.update'), [
             'app_name' => 'SDMS',
+            'currency' => 'usd',
             'remove_logo' => true,
         ])
         ->assertSessionHasNoErrors()
@@ -93,14 +100,29 @@ test('general settings require an app name', function () {
         ->from(route('settings.general.edit'))
         ->put(route('settings.general.update'), [
             'app_name' => '',
+            'currency' => 'usd',
         ])
         ->assertSessionHasErrors('app_name')
+        ->assertRedirect(route('settings.general.edit'));
+});
+
+test('general settings reject an invalid currency', function () {
+    $admin = User::factory()->administrator()->create();
+
+    $this->actingAs($admin)
+        ->from(route('settings.general.edit'))
+        ->put(route('settings.general.update'), [
+            'app_name' => 'SDMS',
+            'currency' => 'eur',
+        ])
+        ->assertSessionHasErrors('currency')
         ->assertRedirect(route('settings.general.edit'));
 });
 
 test('shared inertia props use system settings', function () {
     SystemSetting::query()->create([
         'app_name' => 'اسم مخصص',
+        'currency' => Currency::Iqd,
     ]);
 
     $admin = User::factory()->administrator()->create();
@@ -110,7 +132,10 @@ test('shared inertia props use system settings', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->where('name', 'اسم مخصص')
-            ->where('logoUrl', null));
+            ->where('logoUrl', null)
+            ->where('currency.code', 'iqd')
+            ->where('currency.symbol', 'د.ع')
+            ->where('currency.label', 'دينار عراقي'));
 });
 
 test('config app name follows system settings', function () {
@@ -123,6 +148,7 @@ test('config app name follows system settings', function () {
     $this->actingAs($admin)
         ->put(route('settings.general.update'), [
             'app_name' => 'اسم محدّث',
+            'currency' => 'usd',
             'invoice_header' => null,
             'invoice_footer' => null,
             'receipt_header' => null,
@@ -132,4 +158,10 @@ test('config app name follows system settings', function () {
 
     expect(config('app.name'))->toBe('اسم محدّث')
         ->and(SystemSetting::current()->app_name)->toBe('اسم محدّث');
+});
+
+test('system settings default currency is usd', function () {
+    $settings = SystemSetting::current();
+
+    expect($settings->currency)->toBe(Currency::Usd);
 });

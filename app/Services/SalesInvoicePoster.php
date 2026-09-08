@@ -26,8 +26,8 @@ class SalesInvoicePoster
                 ->with(['lines.product'])
                 ->firstOrFail();
 
-            if ($locked->isPosted()) {
-                throw new InvalidArgumentException('لا يمكن ترحيل مستند مرحّل مسبقاً.');
+            if (! $locked->isDraft()) {
+                throw new InvalidArgumentException('لا يمكن ترحيل إلا مسودة الفاتورة.');
             }
 
             if ($locked->lines->isEmpty()) {

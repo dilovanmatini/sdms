@@ -20,7 +20,7 @@ class DistributorFactory extends Factory
             'contact_person' => fake()->name(),
             'phone' => fake()->phoneNumber(),
             'address' => fake()->address(),
-            'credit_limit' => fake()->optional()->randomFloat(2, 1000, 50000),
+            'credit_limit' => fake()->optional()->numberBetween(1000, 50000),
             'notes' => fake()->optional()->sentence(),
             'is_active' => true,
         ];

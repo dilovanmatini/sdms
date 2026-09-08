@@ -72,7 +72,7 @@ export function NavUser({ collapsed = false }: { collapsed?: boolean }) {
                     id={menuId}
                     role="menu"
                     className={cn(
-                        'absolute z-50 min-w-56 divide-y divide-gray-100 rounded-lg border border-gray-200 bg-white py-1 shadow focus:outline-none dark:border-gray-600 dark:bg-gray-700',
+                        'absolute z-50 min-w-56 rounded-lg border border-gray-200 bg-white py-1 shadow focus:outline-none dark:border-gray-600 dark:bg-gray-700',
                         collapsed
                             ? 'end-full bottom-0 me-2'
                             : 'inset-s-0 bottom-full mb-2 w-full',

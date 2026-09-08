@@ -11,6 +11,8 @@ import {
 import { Pencil, Plus, Tags } from 'lucide-react';
 import CategoryController from '@/actions/App/Http/Controllers/CategoryController';
 import { ActiveBadge } from '@/components/active-badge';
+import { ActiveStatusFilter } from '@/components/active-status-filter';
+import type { ActiveStatusOption } from '@/components/active-status-filter';
 import { DeleteButton } from '@/components/delete-button';
 import { FormCard } from '@/components/form-card';
 import { PaginationLinks } from '@/components/pagination-links';
@@ -30,10 +32,15 @@ type CategoryRow = {
 
 type Props = {
     categories: Paginated<CategoryRow>;
-    filters: { search: string };
+    filters: { search: string; is_active: string };
+    active_status_options: ActiveStatusOption[];
 };
 
-export default function CategoriesIndex({ categories, filters }: Props) {
+export default function CategoriesIndex({
+    categories,
+    filters,
+    active_status_options,
+}: Props) {
     return (
         <>
             <Head title="الأصناف" />
@@ -53,12 +60,23 @@ export default function CategoriesIndex({ categories, filters }: Props) {
                 }
             >
                 <div className="space-y-4">
-                    <SearchFilter
-                        url={index.url()}
-                        initial={filters.search}
-                        placeholder="بحث بالاسم أو الوصف..."
-                        className="max-w-none sm:max-w-md"
-                    />
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                        <SearchFilter
+                            url={index.url()}
+                            initial={filters.search}
+                            placeholder="بحث بالاسم أو الوصف..."
+                            className="max-w-none grow sm:max-w-md"
+                            params={{
+                                is_active: filters.is_active || undefined,
+                            }}
+                        />
+                        <ActiveStatusFilter
+                            url={index.url()}
+                            value={filters.is_active}
+                            search={filters.search}
+                            options={active_status_options}
+                        />
+                    </div>
 
                     <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
                         <Table>
@@ -144,7 +162,7 @@ export default function CategoriesIndex({ categories, filters }: Props) {
                         </Table>
                     </div>
 
-                    <PaginationLinks meta={categories} />
+                    <PaginationLinks meta={categories} storageKey="categories" />
                 </div>
             </FormCard>
         </>

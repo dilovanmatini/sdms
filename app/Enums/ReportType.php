@@ -32,10 +32,10 @@ enum ReportType: string
         return match ($this) {
             self::Inventory => 'المنتجات والكميات المتاحة',
             self::Suppliers => 'الموردون ونشاط المشتريات',
-            self::Purchases => 'فواتير المشتريات المرحّلة',
-            self::Sales => 'فواتير المبيعات المرحّلة',
+            self::Purchases => 'فواتير المشتريات النشطة',
+            self::Sales => 'فواتير المبيعات النشطة',
             self::OutstandingCustomers => 'الموزعون الذين عليهم أرصدة متبقية',
-            self::Payments => 'سندات القبض المرحّلة',
+            self::Payments => 'سندات القبض النشطة',
             self::DailySales => 'إجمالي المبيعات حسب اليوم',
             self::MonthlySales => 'إجمالي المبيعات حسب الشهر',
         };

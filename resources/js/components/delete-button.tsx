@@ -5,6 +5,7 @@ import {
     ModalBody,
     ModalFooter,
     ModalHeader,
+    Tooltip,
 } from 'flowbite-react';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -12,6 +13,7 @@ import { useState } from 'react';
 type Props = {
     href: string;
     disabled?: boolean;
+    disabledReason?: string;
     confirmTitle?: string;
     confirmMessage?: string;
 };
@@ -19,6 +21,7 @@ type Props = {
 export function DeleteButton({
     href,
     disabled = false,
+    disabledReason = 'لا يمكن الحذف لوجود سجلات مرتبطة',
     confirmTitle = 'تأكيد الحذف',
     confirmMessage = 'هل أنت متأكد من الحذف؟ لا يمكن التراجع عن هذا الإجراء.',
 }: Props) {
@@ -36,19 +39,31 @@ export function DeleteButton({
         });
     };
 
+    const button = (
+        <Button
+            color="light"
+            size="xs"
+            disabled={disabled}
+            onClick={() => setOpen(true)}
+            title={disabled ? undefined : 'حذف'}
+            aria-label={disabled ? disabledReason : 'حذف'}
+            className="inline-flex items-center justify-center p-2"
+        >
+            <Trash2 className="h-3.5 w-3.5 text-red-600 dark:text-red-400" />
+        </Button>
+    );
+
     return (
         <>
-            <Button
-                color="light"
-                size="xs"
-                disabled={disabled}
-                onClick={() => setOpen(true)}
-                title={disabled ? 'لا يمكن الحذف لوجود سجلات مرتبطة' : 'حذف'}
-                aria-label="حذف"
-                className="inline-flex items-center justify-center p-2"
-            >
-                <Trash2 className="h-3.5 w-3.5 text-red-600 dark:text-red-400" />
-            </Button>
+            {disabled ? (
+                <Tooltip content={disabledReason} placement="top">
+                    <span className="inline-flex cursor-not-allowed">
+                        {button}
+                    </span>
+                </Tooltip>
+            ) : (
+                button
+            )}
 
             <Modal
                 show={open}

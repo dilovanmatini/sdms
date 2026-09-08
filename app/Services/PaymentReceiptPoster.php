@@ -9,6 +9,7 @@ use App\Models\CustomerLedgerEntry;
 use App\Models\PaymentReceipt;
 use App\Models\SalesInvoice;
 use App\Models\User;
+use App\Support\MoneyDisplay;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -24,8 +25,8 @@ class PaymentReceiptPoster
                 ->with(['allocations.salesInvoice'])
                 ->firstOrFail();
 
-            if ($locked->isPosted()) {
-                throw new InvalidArgumentException('لا يمكن ترحيل مستند مرحّل مسبقاً.');
+            if (! $locked->isDraft()) {
+                throw new InvalidArgumentException('لا يمكن ترحيل إلا سند القبض المسودة.');
             }
 
             if ($locked->allocations->isEmpty()) {
@@ -45,7 +46,7 @@ class PaymentReceiptPoster
                 $invoice = $allocation->salesInvoice;
 
                 if ($invoice === null || ! $invoice->isPosted()) {
-                    throw new InvalidArgumentException('يمكن التوزيع فقط على فواتير مبيعات مرحّلة.');
+                    throw new InvalidArgumentException('يمكن التوزيع فقط على فواتير مبيعات نشطة.');
                 }
 
                 if ((int) $invoice->distributor_id !== (int) $locked->distributor_id) {
@@ -56,7 +57,7 @@ class PaymentReceiptPoster
 
                 if (bccomp((string) $allocation->amount, $remaining, 2) === 1) {
                     throw new InvalidArgumentException(
-                        "مبلغ التوزيع يتجاوز المتبقي للفاتورة {$invoice->number}. المتبقي: {$remaining}",
+                        'مبلغ التوزيع يتجاوز المتبقي للفاتورة '.$invoice->number.'. المتبقي: '.MoneyDisplay::withSymbol($remaining),
                     );
                 }
 

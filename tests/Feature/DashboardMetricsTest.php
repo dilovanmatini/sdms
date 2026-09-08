@@ -43,10 +43,13 @@ test('dashboard shows aggregated kpis for authenticated users', function () {
         ->assertSuccessful()
         ->assertInertia(fn ($page) => $page
             ->component('dashboard')
-            ->where('metrics.current_inventory_units', '40.000')
-            ->where('metrics.today_sales', '120.00')
-            ->where('metrics.outstanding_receivables', '120.00')
+            ->where('metrics.current_inventory_units', '40')
+            ->where('metrics.today_sales', '120 $')
+            ->where('metrics.outstanding_receivables', '120 $')
             ->where('metrics.total_products', 1)
             ->where('metrics.total_customers', 1)
-            ->has('metrics.recent_sales', 1));
+            ->has('metrics.recent_sales', 1)
+            ->where('metrics.recent_sales.0.grand_total', '120 $')
+            ->where('metrics.recent_sales.0.id', fn ($id) => is_int($id) && $id > 0)
+            ->has('metrics.recent_payments'));
 });

@@ -2,15 +2,21 @@
 
 namespace App\Actions\Category;
 
+use App\Actions\Concerns\FiltersByActiveStatus;
+use App\Actions\Concerns\ResolvesDatagridPerPage;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class IndexAction
 {
+    use FiltersByActiveStatus;
+    use ResolvesDatagridPerPage;
+
     public function handle(Request $request)
     {
         $search = $request->string('search')->trim()->toString();
+        $isActive = $this->activeStatusFilter($request);
 
         $categories = Category::query()
             ->withCount('products')
@@ -20,8 +26,9 @@ class IndexAction
                         ->orWhere('description', 'like', "%{$search}%");
                 });
             })
+            ->tap(fn ($query) => $this->applyActiveStatusFilter($query, $isActive))
             ->latest('id')
-            ->paginate(15)
+            ->paginate($this->perPage($request, 'categories'))
             ->withQueryString()
             ->through(fn (Category $category): array => [
                 'id' => $category->id,
@@ -34,7 +41,11 @@ class IndexAction
 
         return Inertia::render('categories/index', [
             'categories' => $categories,
-            'filters' => ['search' => $search],
+            'filters' => [
+                'search' => $search,
+                'is_active' => $isActive,
+            ],
+            'active_status_options' => $this->activeStatusOptions(),
         ]);
     }
 }

@@ -178,7 +178,7 @@ export function AppSidebar() {
             <>
                 <button
                     type="button"
-                    className="fixed top-3 inset-e-3 z-40 inline-flex items-center rounded-lg p-2 text-sm text-gray-500 hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 focus:outline-none md:hidden dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                    className="fixed top-3 inset-e-3 z-40 inline-flex items-center rounded-lg p-2 text-sm text-gray-500 hover:bg-gray-100 focus:ring-0 focus-visible:shadow-focus focus:outline-none md:hidden dark:text-gray-400 dark:hover:bg-gray-700"
                     onClick={() => setMobileOpen(true)}
                     aria-label="فتح القائمة"
                 >

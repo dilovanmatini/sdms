@@ -23,7 +23,7 @@ class Distributor extends Model
     protected function casts(): array
     {
         return [
-            'credit_limit' => 'decimal:2',
+            'credit_limit' => 'integer',
             'is_active' => 'boolean',
         ];
     }

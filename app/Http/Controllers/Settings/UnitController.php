@@ -2,96 +2,46 @@
 
 namespace App\Http\Controllers\Settings;
 
+use App\Actions\Unit\CreateEditAction;
+use App\Actions\Unit\DestroyAction;
+use App\Actions\Unit\IndexAction;
+use App\Actions\Unit\StoreUpdateAction;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreUnitRequest;
-use App\Http\Requests\UpdateUnitRequest;
+use App\Http\Requests\StoreUpdateUnitRequest;
 use App\Models\Unit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Inertia\Response;
 
 class UnitController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, IndexAction $action): Response
     {
         $this->authorize('viewAny', Unit::class);
 
-        $search = $request->string('search')->trim()->toString();
-
-        $units = Unit::query()
-            ->withCount('products')
-            ->when($search !== '', function ($query) use ($search): void {
-                $query->where(function ($query) use ($search): void {
-                    $query->where('name', 'like', "%{$search}%")
-                        ->orWhere('symbol', 'like', "%{$search}%");
-                });
-            })
-            ->orderBy('name')
-            ->paginate(15)
-            ->withQueryString()
-            ->through(fn (Unit $unit): array => [
-                'id' => $unit->id,
-                'name' => $unit->name,
-                'symbol' => $unit->symbol,
-                'is_active' => $unit->is_active,
-                'products_count' => $unit->products_count,
-                'can_delete' => $unit->products_count === 0,
-            ]);
-
-        return Inertia::render('settings/units/index', [
-            'units' => $units,
-            'filters' => ['search' => $search],
-        ]);
+        return $action->handle($request);
     }
 
-    public function create(): Response
+    public function createEdit(Request $request, ?Unit $unit, CreateEditAction $action): Response
     {
-        $this->authorize('create', Unit::class);
+        if ($unit?->exists) {
+            $this->authorize('update', $unit);
+        } else {
+            $this->authorize('create', Unit::class);
+        }
 
-        return Inertia::render('settings/units/create');
+        return $action->handle($request, $unit);
     }
 
-    public function store(StoreUnitRequest $request): RedirectResponse
+    public function storeUpdate(StoreUpdateUnitRequest $request, ?Unit $unit, StoreUpdateAction $action): RedirectResponse
     {
-        Unit::query()->create($request->validated());
-
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'تم إنشاء وحدة القياس بنجاح.']);
-
-        return to_route('units.index');
+        return $action->handle($request, $unit);
     }
 
-    public function edit(Unit $unit): Response
-    {
-        $this->authorize('update', $unit);
-
-        return Inertia::render('settings/units/edit', [
-            'unit' => [
-                'id' => $unit->id,
-                'name' => $unit->name,
-                'symbol' => $unit->symbol,
-                'is_active' => $unit->is_active,
-            ],
-        ]);
-    }
-
-    public function update(UpdateUnitRequest $request, Unit $unit): RedirectResponse
-    {
-        $unit->update($request->validated());
-
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'تم تحديث وحدة القياس بنجاح.']);
-
-        return to_route('units.index');
-    }
-
-    public function destroy(Unit $unit): RedirectResponse
+    public function destroy(Unit $unit, DestroyAction $action): RedirectResponse
     {
         $this->authorize('delete', $unit);
 
-        $unit->delete();
-
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'تم حذف وحدة القياس بنجاح.']);
-
-        return to_route('units.index');
+        return $action->handle($unit);
     }
 }

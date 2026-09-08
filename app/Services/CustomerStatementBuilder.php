@@ -7,6 +7,7 @@ use App\Models\CustomerLedgerEntry;
 use App\Models\Distributor;
 use App\Models\PaymentReceipt;
 use App\Models\SalesInvoice;
+use App\Support\MoneyDisplay;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 
@@ -72,9 +73,9 @@ class CustomerStatementBuilder
                 'type' => $entry->reference_type->value,
                 'type_label' => $entry->reference_type->label(),
                 'reference_number' => $referenceNumbers[$entry->reference_type->value][$entry->reference_id] ?? null,
-                'debit' => $debit,
-                'credit' => $credit,
-                'running_balance' => $running,
+                'debit' => MoneyDisplay::withSymbol($debit),
+                'credit' => MoneyDisplay::withSymbol($credit),
+                'running_balance' => MoneyDisplay::withSymbol($running),
             ];
         }
 
@@ -88,10 +89,10 @@ class CustomerStatementBuilder
             ],
             'from_date' => $fromDate?->toDateString(),
             'to_date' => $toDate?->toDateString(),
-            'opening_balance' => $openingBalance,
-            'closing_balance' => $running,
-            'total_debit' => $totalDebit,
-            'total_credit' => $totalCredit,
+            'opening_balance' => MoneyDisplay::withSymbol($openingBalance),
+            'closing_balance' => MoneyDisplay::withSymbol($running),
+            'total_debit' => MoneyDisplay::withSymbol($totalDebit),
+            'total_credit' => MoneyDisplay::withSymbol($totalCredit),
             'entries' => $rows,
         ];
     }

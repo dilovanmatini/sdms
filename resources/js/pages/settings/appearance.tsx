@@ -1,6 +1,7 @@
 import { Head } from '@inertiajs/react';
+import { Palette } from 'lucide-react';
 import AppearanceTabs from '@/components/appearance-tabs';
-import Heading from '@/components/heading';
+import { FormCard } from '@/components/form-card';
 import { edit as editAppearance } from '@/routes/appearance';
 
 export default function Appearance() {
@@ -8,16 +9,13 @@ export default function Appearance() {
         <>
             <Head title="إعدادات المظهر" />
 
-            <h1 className="sr-only">إعدادات المظهر</h1>
-
-            <div className="space-y-6">
-                <Heading
-                    variant="small"
-                    title="إعدادات المظهر"
-                    description="تحديث مظهر حسابك"
-                />
+            <FormCard
+                title="إعدادات المظهر"
+                description="تحديث مظهر حسابك"
+                icon={Palette}
+            >
                 <AppearanceTabs />
-            </div>
+            </FormCard>
         </>
     );
 }

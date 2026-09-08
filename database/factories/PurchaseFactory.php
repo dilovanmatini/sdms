@@ -37,6 +37,15 @@ class PurchaseFactory extends Factory
         ]);
     }
 
+    public function cancelled(?User $poster = null): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'status' => DocumentStatus::Cancelled,
+            'posted_at' => now(),
+            'posted_by' => $poster?->id ?? User::factory(),
+        ]);
+    }
+
     public function withLines(int $count = 1): static
     {
         return $this->afterCreating(function (Purchase $purchase) use ($count): void {

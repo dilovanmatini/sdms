@@ -43,6 +43,11 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => $settings->app_name,
             'logoUrl' => $settings->logo_url,
+            'currency' => [
+                'code' => $settings->currency->value,
+                'symbol' => $settings->currency->symbol(),
+                'label' => $settings->currency->label(),
+            ],
             'auth' => [
                 'user' => $user === null ? null : [
                     ...$user->toArray(),

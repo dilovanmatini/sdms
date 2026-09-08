@@ -9,6 +9,8 @@ type Props = {
     initial?: string;
     placeholder?: string;
     className?: string;
+    /** Extra query params preserved on submit (e.g. status filters). */
+    params?: Record<string, string | undefined>;
 };
 
 export function SearchFilter({
@@ -16,14 +18,28 @@ export function SearchFilter({
     initial = '',
     placeholder = 'بحث...',
     className,
+    params,
 }: Props) {
     const [search, setSearch] = useState(initial);
 
     const submit = (event: FormEvent) => {
         event.preventDefault();
+
+        const current =
+            typeof window === 'undefined'
+                ? {}
+                : Object.fromEntries(
+                      new URLSearchParams(window.location.search),
+                  );
+
         router.get(
             url,
-            { search: search || undefined },
+            {
+                ...current,
+                ...params,
+                search: search || undefined,
+                page: undefined,
+            },
             { preserveState: true, replace: true },
         );
     };

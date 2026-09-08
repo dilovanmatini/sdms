@@ -1,6 +1,14 @@
-import { Button, Label, Select, TextInput } from 'flowbite-react';
+import { Button, Label, TextInput } from 'flowbite-react';
 import { Plus, Trash2 } from 'lucide-react';
+import {
+    AsyncSearchableSelect
+
+} from '@/components/async-searchable-select';
+import type {SearchableSelectOption} from '@/components/async-searchable-select';
 import InputError from '@/components/input-error';
+import { lookupQuery } from '@/hooks/use-lookup-options';
+import { useCurrency, useFormatMoney } from '@/lib/money';
+import { products as productLookups } from '@/routes/lookups';
 
 export type SalesInvoiceLineDraft = {
     product_id: string;
@@ -8,15 +16,9 @@ export type SalesInvoiceLineDraft = {
     unit_price: string;
 };
 
-type ProductOption = {
-    id: number;
-    code: string;
-    name_ar: string;
-};
-
 type Props = {
     lines: SalesInvoiceLineDraft[];
-    products: ProductOption[];
+    selectedProducts?: SearchableSelectOption[];
     errors: Record<string, string | undefined>;
     readOnly?: boolean;
     onChange: (lines: SalesInvoiceLineDraft[]) => void;
@@ -35,11 +37,13 @@ function lineTotal(line: SalesInvoiceLineDraft): string {
 
 export function SalesInvoiceLinesEditor({
     lines,
-    products,
+    selectedProducts = [],
     errors,
     readOnly = false,
     onChange,
 }: Props) {
+    const formatMoney = useFormatMoney();
+    const { symbol } = useCurrency();
     const updateLine = (
         index: number,
         field: keyof SalesInvoiceLineDraft,
@@ -70,11 +74,11 @@ export function SalesInvoiceLinesEditor({
     return (
         <div className="space-y-3">
             <div className="flex items-center justify-between">
-                <Label>البنود</Label>
+                <Label>العناصر</Label>
                 {!readOnly && (
                     <Button type="button" size="xs" color="light" onClick={addLine}>
                         <Plus className="me-1 h-3.5 w-3.5" />
-                        إضافة بند
+                        إضافة عنصر
                     </Button>
                 )}
             </div>
@@ -90,26 +94,27 @@ export function SalesInvoiceLinesEditor({
                             <Label htmlFor={`lines_${index}_product_id`}>
                                 المنتج
                             </Label>
-                            <Select
+                            <AsyncSearchableSelect
                                 id={`lines_${index}_product_id`}
+                                name={`lines[${index}][product_id]`}
                                 value={line.product_id}
                                 disabled={readOnly}
                                 required
-                                onChange={(event) =>
-                                    updateLine(
-                                        index,
-                                        'product_id',
-                                        event.target.value,
+                                placeholder="اختر المنتج"
+                                searchPlaceholder="ابحث عن منتج..."
+                                initialOptions={selectedProducts}
+                                buildUrl={(search) =>
+                                    productLookups.url(
+                                        lookupQuery(search, {
+                                            include:
+                                                line.product_id || undefined,
+                                        }),
                                     )
                                 }
-                            >
-                                <option value="">اختر المنتج</option>
-                                {products.map((product) => (
-                                    <option key={product.id} value={product.id}>
-                                        {product.code} — {product.name_ar}
-                                    </option>
-                                ))}
-                            </Select>
+                                onChange={(value) =>
+                                    updateLine(index, 'product_id', value)
+                                }
+                            />
                             <InputError
                                 message={errors[`lines.${index}.product_id`]}
                             />
@@ -122,8 +127,8 @@ export function SalesInvoiceLinesEditor({
                             <TextInput
                                 id={`lines_${index}_quantity`}
                                 type="number"
-                                min="0.001"
-                                step="any"
+                                min="0"
+                                step="1"
                                 value={line.quantity}
                                 disabled={readOnly}
                                 required
@@ -142,13 +147,13 @@ export function SalesInvoiceLinesEditor({
 
                         <div className="grid gap-2">
                             <Label htmlFor={`lines_${index}_unit_price`}>
-                                سعر الوحدة
+                                سعر الوحدة ({symbol})
                             </Label>
                             <TextInput
                                 id={`lines_${index}_unit_price`}
                                 type="number"
                                 min="0"
-                                step="0.01"
+                                step="any"
                                 value={line.unit_price}
                                 disabled={readOnly}
                                 required
@@ -168,24 +173,34 @@ export function SalesInvoiceLinesEditor({
                         <div className="grid gap-2">
                             <Label>الإجمالي</Label>
                             <TextInput
-                                value={lineTotal(line)}
+                                value={formatMoney(lineTotal(line))}
                                 readOnly
                                 disabled
                             />
                         </div>
 
                         {!readOnly && (
-                            <div className="flex items-end">
-                                <Button
-                                    type="button"
-                                    color="failure"
-                                    size="xs"
-                                    disabled={lines.length === 1}
-                                    onClick={() => removeLine(index)}
-                                    title="حذف البند"
+                            <div className="grid gap-2">
+                                <Label
+                                    className="invisible select-none"
+                                    aria-hidden="true"
                                 >
-                                    <Trash2 className="h-3.5 w-3.5" />
-                                </Button>
+                                    &nbsp;
+                                </Label>
+                                <div className="flex min-h-[2.625rem] items-center">
+                                    <Button
+                                        type="button"
+                                        color="red"
+                                        size="xs"
+                                        disabled={lines.length === 1}
+                                        onClick={() => removeLine(index)}
+                                        title="حذف العنصر"
+                                        aria-label="حذف العنصر"
+                                        className="inline-flex items-center justify-center p-2"
+                                    >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                    </Button>
+                                </div>
                             </div>
                         )}
                     </div>

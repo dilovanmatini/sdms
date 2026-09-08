@@ -7,6 +7,8 @@ use App\Models\Distributor;
 use App\Models\PaymentReceipt;
 use App\Models\Product;
 use App\Models\SalesInvoice;
+use App\Support\MoneyDisplay;
+use App\Support\QuantityDisplay;
 use Illuminate\Support\Facades\DB;
 
 class DashboardMetrics
@@ -60,7 +62,7 @@ class DashboardMetrics
                 'number' => $invoice->number,
                 'invoice_date' => $invoice->invoice_date?->toDateString(),
                 'distributor' => $invoice->distributor?->name,
-                'grand_total' => number_format((float) $invoice->grand_total, 2, '.', ''),
+                'grand_total' => MoneyDisplay::format($invoice->grand_total, trim: true),
             ])
             ->all();
 
@@ -77,15 +79,15 @@ class DashboardMetrics
                 'number' => $receipt->number,
                 'receipt_date' => $receipt->receipt_date?->toDateString(),
                 'distributor' => $receipt->distributor?->name,
-                'total_amount' => number_format((float) ($receipt->total_amount ?? 0), 2, '.', ''),
+                'total_amount' => MoneyDisplay::format($receipt->total_amount ?? 0, trim: true),
             ])
             ->all();
 
         return [
-            'current_inventory_units' => number_format((float) ($inventoryUnits ?? 0), 3, '.', ''),
-            'today_sales' => number_format((float) $todaySales, 2, '.', ''),
-            'month_sales' => number_format((float) $monthSales, 2, '.', ''),
-            'outstanding_receivables' => number_format((float) ($outstanding ?? 0), 2, '.', ''),
+            'current_inventory_units' => QuantityDisplay::format($inventoryUnits ?? 0),
+            'today_sales' => MoneyDisplay::format($todaySales, trim: true),
+            'month_sales' => MoneyDisplay::format($monthSales, trim: true),
+            'outstanding_receivables' => MoneyDisplay::format($outstanding ?? 0, trim: true),
             'total_customers' => Distributor::query()->count(),
             'total_products' => Product::query()->count(),
             'recent_sales' => $recentSales,

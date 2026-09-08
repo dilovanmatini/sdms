@@ -28,8 +28,8 @@ export function FormCard({
                 className,
             )}
         >
-            <div className="flex flex-col gap-4 border-b border-gray-200 px-4 py-5 sm:flex-row sm:items-start sm:justify-between sm:px-6 dark:border-gray-700">
-                <div className="flex items-start gap-3">
+            <div className="flex flex-col gap-4 border-b border-gray-200 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 dark:border-gray-700">
+                <div className="flex items-center gap-3">
                     {Icon && (
                         <div className="rounded-full bg-primary-50 p-2.5 text-primary-700 dark:bg-gray-700 dark:text-primary-300">
                             <Icon className="h-5 w-5" aria-hidden />
@@ -61,19 +61,26 @@ export function FormCard({
 
 export function FormActions({
     children,
+    secondary,
     className,
 }: {
-    children: ReactNode;
+    children?: ReactNode;
+    secondary?: ReactNode;
     className?: string;
 }) {
     return (
         <div
             className={cn(
-                'flex flex-col-reverse gap-2 border-t border-gray-200 pt-5 sm:flex-row sm:items-center sm:justify-start dark:border-gray-700',
+                'flex flex-wrap items-center justify-between gap-2 border-t border-gray-200 pt-5 dark:border-gray-700',
                 className,
             )}
         >
-            {children}
+            <div className="flex flex-wrap items-center gap-2">{children}</div>
+            {secondary != null && (
+                <div className="flex flex-wrap items-center gap-2">
+                    {secondary}
+                </div>
+            )}
         </div>
     );
 }

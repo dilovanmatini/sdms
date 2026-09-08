@@ -1,8 +1,9 @@
 import { Form } from '@inertiajs/react';
 import { Button, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'flowbite-react';
+import { TriangleAlert } from 'lucide-react';
 import { useRef, useState } from 'react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
-import Heading from '@/components/heading';
+import { FormCard } from '@/components/form-card';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 
@@ -11,12 +12,11 @@ export default function DeleteUser() {
     const [open, setOpen] = useState(false);
 
     return (
-        <div className="space-y-6">
-            <Heading
-                variant="small"
-                title="منطقة الخطر"
-                description="حذف حسابك وجميع موارده"
-            />
+        <FormCard
+            title="منطقة الخطر"
+            description="حذف حسابك وجميع موارده"
+            icon={TriangleAlert}
+        >
             <div className="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10">
                 <div className="relative space-y-0.5 text-red-600 dark:text-red-100">
                     <p className="font-medium">تحذير</p>
@@ -26,7 +26,7 @@ export default function DeleteUser() {
                 </div>
 
                 <Button
-                    color="failure"
+                    color="red"
                     data-test="delete-user-button"
                     onClick={() => setOpen(true)}
                 >
@@ -87,7 +87,7 @@ export default function DeleteUser() {
                                         </Button>
 
                                         <Button
-                                            color="failure"
+                                            color="red"
                                             type="submit"
                                             disabled={processing}
                                             data-test="confirm-delete-user-button"
@@ -101,6 +101,6 @@ export default function DeleteUser() {
                     </ModalBody>
                 </Modal>
             </div>
-        </div>
+        </FormCard>
     );
 }

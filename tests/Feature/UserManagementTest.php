@@ -7,7 +7,15 @@ test('administrator can create users', function () {
     $admin = User::factory()->administrator()->create();
 
     $this->actingAs($admin)
-        ->post(route('users.store'), [
+        ->get(route('users.create-edit'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('settings/users/create-edit')
+            ->where('user', null));
+
+    $this->actingAs($admin)
+        ->from(route('users.create-edit'))
+        ->post(route('users.store-update'), [
             'name' => 'موظف المخزن',
             'username' => 'warehouse1',
             'email' => 'warehouse1@example.com',
@@ -16,7 +24,8 @@ test('administrator can create users', function () {
             'role' => UserRole::Warehouse->value,
             'is_active' => true,
         ])
-        ->assertRedirect(route('users.index'));
+        ->assertSessionHasNoErrors()
+        ->assertRedirect();
 
     $this->assertDatabaseHas('users', [
         'username' => 'warehouse1',

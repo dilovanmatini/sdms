@@ -22,8 +22,8 @@ class PurchasePoster
                 ->with('lines')
                 ->firstOrFail();
 
-            if ($locked->isPosted()) {
-                throw new InvalidArgumentException('لا يمكن ترحيل مستند مرحّل مسبقاً.');
+            if (! $locked->isDraft()) {
+                throw new InvalidArgumentException('لا يمكن ترحيل إلا مسودة المشترى.');
             }
 
             if ($locked->lines->isEmpty()) {

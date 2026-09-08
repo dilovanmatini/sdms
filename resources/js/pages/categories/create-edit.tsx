@@ -1,7 +1,8 @@
 import { Form, Head } from '@inertiajs/react';
-import { Button, Label, Select, Textarea, TextInput } from 'flowbite-react';
+import { Button, Label, Textarea, TextInput } from 'flowbite-react';
 import { Edit, Tags } from 'lucide-react';
 import CategoryController from '@/actions/App/Http/Controllers/CategoryController';
+import { ActiveStatusToggle } from '@/components/active-status-toggle';
 import { FormActions, FormCard } from '@/components/form-card';
 import InputError from '@/components/input-error';
 import { createEdit, index } from '@/routes/categories';
@@ -42,18 +43,10 @@ export default function CategoriesCreateEdit({ category }: Props) {
                                     <InputError message={errors.name} />
                                 </div>
 
-                                <div className="grid gap-2">
-                                    <Label htmlFor="is_active">الحالة</Label>
-                                    <Select
-                                        id="is_active"
-                                        name="is_active"
-                                        defaultValue={category?.is_active ? '1' : '0'}
-                                    >
-                                        <option value="1">نشط</option>
-                                        <option value="0">غير نشط</option>
-                                    </Select>
-                                    <InputError message={errors.is_active} />
-                                </div>
+                                <ActiveStatusToggle
+                                    defaultChecked={category?.is_active ?? true}
+                                    error={errors.is_active}
+                                />
                             </div>
 
                             <div className="grid gap-2">
@@ -67,16 +60,19 @@ export default function CategoriesCreateEdit({ category }: Props) {
                                 <InputError message={errors.description} />
                             </div>
 
-                            <FormActions>
+                            <FormActions
+                                secondary={
+                                    <Button
+                                        color="light"
+                                        href={index.url()}
+                                        as="a"
+                                    >
+                                        رجوع
+                                    </Button>
+                                }
+                            >
                                 <Button type="submit" disabled={processing}>
                                     {category ? 'حفظ التعديلات' : 'إنشاء الصنف'}
-                                </Button>
-                                <Button
-                                    color="light"
-                                    href={index.url()}
-                                    as="a"
-                                >
-                                    إلغاء
                                 </Button>
                             </FormActions>
                         </>

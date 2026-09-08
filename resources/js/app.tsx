@@ -6,6 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SystemSettingsLayout from '@/layouts/settings/system-layout';
 import UserSettingsLayout from '@/layouts/settings/user-layout';
+import { registerServiceWorker } from '@/lib/register-service-worker';
 import { flowbiteTheme } from '@/theme/flowbite';
 
 const userSettingsPages = new Set([
@@ -29,11 +30,9 @@ createInertiaApp({
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
-            case name === 'settings/index':
-                return AppLayout;
             case userSettingsPages.has(name):
                 return [AppLayout, UserSettingsLayout];
-            case name.startsWith('settings/'):
+            case name === 'settings/index' || name.startsWith('settings/'):
                 return [AppLayout, SystemSettingsLayout];
             default:
                 return AppLayout;
@@ -129,6 +128,16 @@ createInertiaApp({
                     toast: {
                         toggle: { base: 'replace' },
                     },
+                    toggleSwitch: {
+                        toggle: {
+                            base: 'replace',
+                            checked: {
+                                color: {
+                                    default: 'replace',
+                                },
+                            },
+                        },
+                    },
                 }}
             >
                 {app}
@@ -143,3 +152,4 @@ createInertiaApp({
 
 // This will set light / dark mode on load...
 initializeTheme();
+registerServiceWorker();

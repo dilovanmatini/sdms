@@ -2,7 +2,7 @@ import { Form } from '@inertiajs/react';
 import { Button } from 'flowbite-react';
 import { ShieldCheck } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import Heading from '@/components/heading';
+import { FormCard } from '@/components/form-card';
 import TwoFactorRecoveryCodes from '@/components/two-factor-recovery-codes';
 import TwoFactorSetupModal from '@/components/two-factor-setup-modal';
 import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
@@ -45,12 +45,11 @@ export default function ManageTwoFactor(props: Props) {
     }
 
     return (
-        <div className="space-y-6">
-            <Heading
-                variant="small"
-                title="المصادقة الثنائية"
-                description="إدارة إعدادات المصادقة الثنائية"
-            />
+        <FormCard
+            title="المصادقة الثنائية"
+            description="إدارة إعدادات المصادقة الثنائية"
+            icon={ShieldCheck}
+        >
             {twoFactorEnabled ? (
                 <div className="flex flex-col items-start justify-start space-y-4">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -62,7 +61,7 @@ export default function ManageTwoFactor(props: Props) {
                         <Form {...disable.form()}>
                             {({ processing }) => (
                                 <Button
-                                    color="failure"
+                                    color="red"
                                     type="submit"
                                     disabled={processing}
                                 >
@@ -122,6 +121,6 @@ export default function ManageTwoFactor(props: Props) {
                 fetchSetupData={fetchSetupData}
                 errors={errors}
             />
-        </div>
+        </FormCard>
     );
 }

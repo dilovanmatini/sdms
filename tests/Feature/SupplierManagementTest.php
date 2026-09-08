@@ -9,7 +9,19 @@ test('administrator can manage suppliers', function () {
     $admin = User::factory()->administrator()->create();
 
     $this->actingAs($admin)
-        ->post(route('suppliers.store'), [
+        ->get(route('suppliers.index'))
+        ->assertOk();
+
+    $this->actingAs($admin)
+        ->get(route('suppliers.create-edit'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('suppliers/create-edit')
+            ->where('supplier', null));
+
+    $this->actingAs($admin)
+        ->from(route('suppliers.create-edit'))
+        ->post(route('suppliers.store-update'), [
             'name' => 'مورد الاختبار',
             'contact_person' => 'أحمد',
             'phone' => '0700000000',
@@ -17,9 +29,39 @@ test('administrator can manage suppliers', function () {
             'notes' => null,
             'is_active' => true,
         ])
-        ->assertRedirect(route('suppliers.index'));
+        ->assertSessionHasNoErrors()
+        ->assertRedirect();
 
     $this->assertDatabaseHas('suppliers', ['name' => 'مورد الاختبار']);
+
+    $supplier = Supplier::query()->where('name', 'مورد الاختبار')->firstOrFail();
+
+    $this->actingAs($admin)
+        ->get(route('suppliers.create-edit', $supplier))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('suppliers/create-edit')
+            ->where('supplier.id', $supplier->id)
+            ->where('supplier.name', 'مورد الاختبار'));
+
+    $this->actingAs($admin)
+        ->from(route('suppliers.create-edit', $supplier))
+        ->post(route('suppliers.store-update', $supplier), [
+            'name' => 'مورد محدث',
+            'contact_person' => 'أحمد',
+            'phone' => '0700000000',
+            'address' => 'أربيل',
+            'notes' => null,
+            'is_active' => false,
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('suppliers.create-edit', $supplier));
+
+    $this->assertDatabaseHas('suppliers', [
+        'id' => $supplier->id,
+        'name' => 'مورد محدث',
+        'is_active' => false,
+    ]);
 });
 
 test('supplier with purchases cannot be deleted', function () {

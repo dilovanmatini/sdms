@@ -70,17 +70,27 @@ class SalesInvoice extends Model
         return $this->hasMany(SalesInvoiceLine::class);
     }
 
+    public function isPosted(): bool
+    {
+        return $this->status === DocumentStatus::Posted;
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->status === DocumentStatus::Cancelled;
+    }
+
+    public function isDraft(): bool
+    {
+        return $this->status === DocumentStatus::Draft;
+    }
+
     /**
      * @return HasMany<PaymentReceiptAllocation, $this>
      */
     public function allocations(): HasMany
     {
         return $this->hasMany(PaymentReceiptAllocation::class);
-    }
-
-    public function isPosted(): bool
-    {
-        return $this->status === DocumentStatus::Posted;
     }
 
     public function allocatedAmount(): string

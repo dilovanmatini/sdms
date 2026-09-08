@@ -1,14 +1,24 @@
 import { Form, Head } from '@inertiajs/react';
-import { Button, Checkbox, FileInput, Label, Textarea, TextInput } from 'flowbite-react';
+import {
+    Button,
+    Checkbox,
+    FileInput,
+    Label,
+    Select,
+    Textarea,
+    TextInput,
+} from 'flowbite-react';
+import { Settings2 } from 'lucide-react';
 import { useState } from 'react';
 import GeneralSettingsController from '@/actions/App/Http/Controllers/Settings/GeneralSettingsController';
-import Heading from '@/components/heading';
+import { FormActions, FormCard } from '@/components/form-card';
 import InputError from '@/components/input-error';
 import { edit } from '@/routes/settings/general';
 import { index as settingsIndex } from '@/routes/settings';
 
 type Settings = {
     app_name: string;
+    currency: string;
     logo_url: string | null;
     invoice_header: string | null;
     invoice_footer: string | null;
@@ -16,11 +26,20 @@ type Settings = {
     receipt_footer: string | null;
 };
 
-type Props = {
-    settings: Settings;
+type CurrencyOption = {
+    value: string;
+    label: string;
 };
 
-export default function GeneralSettings({ settings }: Props) {
+type Props = {
+    settings: Settings;
+    currency_options: CurrencyOption[];
+};
+
+export default function GeneralSettings({
+    settings,
+    currency_options,
+}: Props) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(
         settings.logo_url,
     );
@@ -30,13 +49,11 @@ export default function GeneralSettings({ settings }: Props) {
         <>
             <Head title="الإعدادات العامة" />
 
-            <div className="space-y-6">
-                <Heading
-                    variant="small"
-                    title="عام"
-                    description="اسم التطبيق والشعار ورؤوس وتذييلات المستندات"
-                />
-
+            <FormCard
+                title="عام"
+                description="اسم التطبيق والعملة والشعار ورؤوس وتذييلات المستندات"
+                icon={Settings2}
+            >
                 <Form
                     {...GeneralSettingsController.update.form()}
                     encType="multipart/form-data"
@@ -49,9 +66,9 @@ export default function GeneralSettings({ settings }: Props) {
                     {({ processing, errors }) => (
                         <>
                             <section className="space-y-4">
-                                <h2 className="text-base font-semibold text-gray-900 dark:text-white">
+                                <h3 className="text-base font-semibold text-gray-900 dark:text-white">
                                     الهوية
-                                </h2>
+                                </h3>
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="app_name">اسم التطبيق</Label>
@@ -62,6 +79,26 @@ export default function GeneralSettings({ settings }: Props) {
                                         defaultValue={settings.app_name}
                                     />
                                     <InputError message={errors.app_name} />
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="currency">العملة</Label>
+                                    <Select
+                                        id="currency"
+                                        name="currency"
+                                        required
+                                        defaultValue={settings.currency}
+                                    >
+                                        {currency_options.map((option) => (
+                                            <option
+                                                key={option.value}
+                                                value={option.value}
+                                            >
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </Select>
+                                    <InputError message={errors.currency} />
                                 </div>
 
                                 <div className="grid gap-2">
@@ -133,9 +170,9 @@ export default function GeneralSettings({ settings }: Props) {
                             </section>
 
                             <section className="space-y-4">
-                                <h2 className="text-base font-semibold text-gray-900 dark:text-white">
+                                <h3 className="text-base font-semibold text-gray-900 dark:text-white">
                                     الفاتورة
-                                </h2>
+                                </h3>
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="invoice_header">
@@ -173,9 +210,9 @@ export default function GeneralSettings({ settings }: Props) {
                             </section>
 
                             <section className="space-y-4">
-                                <h2 className="text-base font-semibold text-gray-900 dark:text-white">
+                                <h3 className="text-base font-semibold text-gray-900 dark:text-white">
                                     سند القبض
-                                </h2>
+                                </h3>
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="receipt_header">
@@ -212,15 +249,15 @@ export default function GeneralSettings({ settings }: Props) {
                                 </div>
                             </section>
 
-                            <div className="flex gap-2">
+                            <FormActions>
                                 <Button type="submit" disabled={processing}>
                                     حفظ الإعدادات
                                 </Button>
-                            </div>
+                            </FormActions>
                         </>
                     )}
                 </Form>
-            </div>
+            </FormCard>
         </>
     );
 }

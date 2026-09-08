@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Currency;
 use App\Models\SystemSetting;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateGeneralSettingsRequest extends FormRequest
 {
@@ -46,6 +48,7 @@ class UpdateGeneralSettingsRequest extends FormRequest
     {
         return [
             'app_name' => ['required', 'string', 'max:255'],
+            'currency' => ['required', Rule::enum(Currency::class)],
             'logo' => ['nullable', 'image', 'max:2048'],
             'remove_logo' => ['sometimes', 'boolean'],
             'invoice_header' => ['nullable', 'string', 'max:5000'],
@@ -62,6 +65,7 @@ class UpdateGeneralSettingsRequest extends FormRequest
     {
         return [
             'app_name' => 'اسم التطبيق',
+            'currency' => 'العملة',
             'logo' => 'الشعار',
             'remove_logo' => 'إزالة الشعار',
             'invoice_header' => 'رأس الفاتورة',

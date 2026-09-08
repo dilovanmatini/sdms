@@ -10,7 +10,29 @@ use App\Models\Distributor;
 use App\Models\PaymentReceipt;
 use App\Models\PaymentReceiptAllocation;
 use App\Models\SalesInvoice;
+use App\Models\SystemSetting;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+
+test('payment receipt form lists digital wallets after cash', function () {
+    $admin = User::factory()->administrator()->create();
+
+    $this->actingAs($admin)
+        ->get(route('payment-receipts.create-edit'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('payment-receipts/create-edit')
+            ->where('payment_methods', [
+                ['value' => 'cash', 'label' => 'نقداً'],
+                ['value' => 'fib', 'label' => 'FIB'],
+                ['value' => 'qi_card', 'label' => 'Qi Card'],
+                ['value' => 'fastpay', 'label' => 'FastPay'],
+                ['value' => 'bank_transfer', 'label' => 'تحويل بنكي'],
+                ['value' => 'cheque', 'label' => 'شيك'],
+                ['value' => 'other', 'label' => 'أخرى'],
+            ]));
+});
 
 test('administrator can create a draft payment receipt with allocations', function () {
     $admin = User::factory()->administrator()->create();
@@ -23,7 +45,7 @@ test('administrator can create a draft payment receipt with allocations', functi
     ]);
 
     $this->actingAs($admin)
-        ->post(route('payment-receipts.store'), [
+        ->post(route('payment-receipts.store-update'), [
             'receipt_date' => '2026-08-07',
             'distributor_id' => $distributor->id,
             'payment_method' => PaymentMethod::Cash->value,
@@ -35,7 +57,7 @@ test('administrator can create a draft payment receipt with allocations', functi
                 ],
             ],
         ])
-        ->assertRedirect(route('payment-receipts.index'));
+        ->assertRedirect(route('payment-receipts.create-edit', PaymentReceipt::query()->first()));
 
     $receipt = PaymentReceipt::query()->first();
 
@@ -112,6 +134,117 @@ test('posting a payment receipt creates ledger credits and reduces balance', fun
     ]);
 });
 
+test('cancelling a posted payment receipt reverses ledger entries and restores balances', function () {
+    $admin = User::factory()->administrator()->create();
+    $distributor = Distributor::factory()->create();
+    $invoice = SalesInvoice::factory()->posted($admin)->create([
+        'distributor_id' => $distributor->id,
+        'grand_total' => 200,
+        'subtotal' => 200,
+        'discount' => 0,
+    ]);
+
+    CustomerLedgerEntry::factory()->create([
+        'distributor_id' => $distributor->id,
+        'reference_type' => LedgerReferenceType::Invoice,
+        'reference_id' => $invoice->id,
+        'debit' => 200,
+        'credit' => 0,
+    ]);
+
+    AccountsReceivableEntry::factory()->create([
+        'distributor_id' => $distributor->id,
+        'reference_type' => LedgerReferenceType::Invoice,
+        'reference_id' => $invoice->id,
+        'debit' => 200,
+        'credit' => 0,
+    ]);
+
+    $receipt = PaymentReceipt::factory()->create([
+        'distributor_id' => $distributor->id,
+        'status' => DocumentStatus::Draft,
+    ]);
+
+    PaymentReceiptAllocation::factory()->create([
+        'payment_receipt_id' => $receipt->id,
+        'sales_invoice_id' => $invoice->id,
+        'amount' => 75,
+    ]);
+
+    $this->actingAs($admin)
+        ->post(route('payment-receipts.post', $receipt))
+        ->assertRedirect(route('payment-receipts.index'));
+
+    expect($distributor->balance())->toBe('125')
+        ->and($invoice->remainingAmount())->toBe('125.00');
+
+    $this->actingAs($admin)
+        ->post(route('payment-receipts.cancel', $receipt))
+        ->assertRedirect(route('payment-receipts.index'));
+
+    $receipt->refresh();
+
+    expect($receipt->status)->toBe(DocumentStatus::Cancelled)
+        ->and($distributor->balance())->toBe('200')
+        ->and($invoice->remainingAmount())->toBe('200.00');
+
+    $this->assertDatabaseHas('customer_ledger_entries', [
+        'distributor_id' => $distributor->id,
+        'reference_type' => LedgerReferenceType::Receipt->value,
+        'reference_id' => $receipt->id,
+        'debit' => 75,
+        'credit' => 0,
+    ]);
+
+    $this->assertDatabaseHas('accounts_receivable_entries', [
+        'distributor_id' => $distributor->id,
+        'reference_type' => LedgerReferenceType::Receipt->value,
+        'reference_id' => $receipt->id,
+        'debit' => 75,
+        'credit' => 0,
+    ]);
+});
+
+test('cancelled payment receipts are hidden from the default index and shown when filtered', function () {
+    $admin = User::factory()->administrator()->create();
+    $draft = PaymentReceipt::factory()->create(['status' => DocumentStatus::Draft]);
+    $posted = PaymentReceipt::factory()->posted($admin)->create();
+    $cancelled = PaymentReceipt::factory()->cancelled($admin)->create();
+
+    $this->actingAs($admin)
+        ->get(route('payment-receipts.index'))
+        ->assertSuccessful()
+        ->assertInertia(fn ($page) => $page
+            ->component('payment-receipts/index')
+            ->has('receipts.data', 2)
+            ->where('receipts.data.0.id', $posted->id)
+            ->where('receipts.data.1.id', $draft->id)
+            ->where('filters.status', ''));
+
+    $this->actingAs($admin)
+        ->get(route('payment-receipts.index', ['status' => 'cancelled']))
+        ->assertSuccessful()
+        ->assertInertia(fn ($page) => $page
+            ->component('payment-receipts/index')
+            ->has('receipts.data', 1)
+            ->where('receipts.data.0.id', $cancelled->id)
+            ->where('filters.status', 'cancelled'));
+});
+
+test('draft payment receipt cannot be cancelled and cancelled receipt cannot be cancelled again', function () {
+    $admin = User::factory()->administrator()->create();
+    $draft = PaymentReceipt::factory()->create();
+    $cancelled = PaymentReceipt::factory()->cancelled($admin)->create();
+
+    $this->actingAs($admin)
+        ->post(route('payment-receipts.cancel', $draft))
+        ->assertForbidden();
+
+    $this->actingAs($admin)
+        ->post(route('payment-receipts.cancel', $cancelled))
+        ->assertForbidden();
+});
+
 test('cannot allocate more than invoice remaining balance', function () {
     $admin = User::factory()->administrator()->create();
     $distributor = Distributor::factory()->create(['is_active' => true]);
@@ -123,7 +256,7 @@ test('cannot allocate more than invoice remaining balance', function () {
     ]);
 
     $this->actingAs($admin)
-        ->post(route('payment-receipts.store'), [
+        ->post(route('payment-receipts.store-update'), [
             'receipt_date' => '2026-08-07',
             'distributor_id' => $distributor->id,
             'payment_method' => PaymentMethod::Cash->value,
@@ -209,7 +342,7 @@ test('posted payment receipt cannot be updated or deleted', function () {
     ]);
 
     $this->actingAs($admin)
-        ->put(route('payment-receipts.update', $receipt), [
+        ->post(route('payment-receipts.store-update', $receipt), [
             'receipt_date' => '2026-08-08',
             'distributor_id' => $distributor->id,
             'payment_method' => PaymentMethod::Cash->value,
@@ -238,4 +371,157 @@ test('sales role cannot manage payment receipts', function () {
     $this->actingAs($user)
         ->get(route('payment-receipts.index'))
         ->assertForbidden();
+});
+
+test('administrator can view payment receipts index with receipt numbers', function () {
+    $admin = User::factory()->administrator()->create();
+    $receipt = PaymentReceipt::factory()->create();
+
+    $this->actingAs($admin)
+        ->get(route('payment-receipts.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('payment-receipts/index')
+            ->has('receipts.data', 1)
+            ->where('receipts.data.0.id', $receipt->id)
+            ->where('receipts.data.0.number', $receipt->number)
+            ->where('filters.search', '')
+            ->where('filters.status', '')
+            ->where('filters.distributor_id', null)
+            ->where('filters.payment_method', '')
+            ->where('filters.from_date', null)
+            ->where('filters.to_date', null)
+            ->has('status_options')
+            ->has('payment_method_options'));
+});
+
+test('payment receipts index can filter by distributor, payment method, status, and date range', function () {
+    $admin = User::factory()->administrator()->create();
+    $distributorA = Distributor::factory()->create();
+    $distributorB = Distributor::factory()->create();
+
+    $match = PaymentReceipt::factory()->create([
+        'distributor_id' => $distributorA->id,
+        'receipt_date' => '2026-08-10',
+        'payment_method' => PaymentMethod::Fib,
+        'status' => DocumentStatus::Draft,
+    ]);
+    PaymentReceipt::factory()->create([
+        'distributor_id' => $distributorB->id,
+        'receipt_date' => '2026-08-10',
+        'payment_method' => PaymentMethod::Fib,
+        'status' => DocumentStatus::Draft,
+    ]);
+    PaymentReceipt::factory()->create([
+        'distributor_id' => $distributorA->id,
+        'receipt_date' => '2026-07-01',
+        'payment_method' => PaymentMethod::Fib,
+        'status' => DocumentStatus::Draft,
+    ]);
+    PaymentReceipt::factory()->create([
+        'distributor_id' => $distributorA->id,
+        'receipt_date' => '2026-08-10',
+        'payment_method' => PaymentMethod::Cash,
+        'status' => DocumentStatus::Draft,
+    ]);
+    PaymentReceipt::factory()->posted($admin)->create([
+        'distributor_id' => $distributorA->id,
+        'receipt_date' => '2026-08-10',
+        'payment_method' => PaymentMethod::Fib,
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('payment-receipts.index', [
+            'distributor_id' => $distributorA->id,
+            'payment_method' => PaymentMethod::Fib->value,
+            'status' => DocumentStatus::Draft->value,
+            'from_date' => '2026-08-01',
+            'to_date' => '2026-08-31',
+        ]))
+        ->assertSuccessful()
+        ->assertInertia(fn ($page) => $page
+            ->component('payment-receipts/index')
+            ->has('receipts.data', 1)
+            ->where('receipts.data.0.id', $match->id)
+            ->where('filters.distributor_id', $distributorA->id)
+            ->where('filters.payment_method', PaymentMethod::Fib->value)
+            ->where('filters.status', DocumentStatus::Draft->value)
+            ->where('filters.from_date', '2026-08-01')
+            ->where('filters.to_date', '2026-08-31')
+            ->where('selected_distributor.value', $distributorA->id));
+});
+
+test('posted payment receipt can be printed and draft cannot', function () {
+    $admin = User::factory()->administrator()->create();
+    $invoice = SalesInvoice::factory()->posted($admin)->create(['number' => 'INV-000099']);
+
+    $posted = PaymentReceipt::factory()->posted($admin)->create([
+        'payment_method' => PaymentMethod::Cash,
+    ]);
+    PaymentReceiptAllocation::factory()->create([
+        'payment_receipt_id' => $posted->id,
+        'sales_invoice_id' => $invoice->id,
+        'amount' => 75,
+    ]);
+
+    $draft = PaymentReceipt::factory()->create();
+    $cancelled = PaymentReceipt::factory()->cancelled($admin)->create();
+
+    $this->actingAs($admin)
+        ->get(route('payment-receipts.create-edit', $posted))
+        ->assertSuccessful()
+        ->assertInertia(fn ($page) => $page
+            ->component('payment-receipts/create-edit')
+            ->where('can_print', true)
+            ->where('can_cancel', true)
+            ->where('can_edit', false));
+
+    $this->actingAs($admin)
+        ->get(route('payment-receipts.print', $posted))
+        ->assertSuccessful()
+        ->assertSee($posted->number, false)
+        ->assertSee('سند قبض', false)
+        ->assertSee('إجمالي السند', false)
+        ->assertSee('من', false)
+        ->assertSee('رقم الفاتورة', false)
+        ->assertSee('الإجمالي', false)
+        ->assertSee('INV-000099', false)
+        ->assertSee('>75 $</td>', false)
+        ->assertDontSee('75.00', false)
+        ->assertSee('/images/sdsm-logo.png', false)
+        ->assertSee('IBM Plex Sans Arabic', false)
+        ->assertSee('/fonts/IBMPlexSansArabic-Regular.ttf', false)
+        ->assertSee('window.print()', false);
+
+    $this->actingAs($admin)
+        ->get(route('payment-receipts.print', $draft))
+        ->assertForbidden();
+
+    $this->actingAs($admin)
+        ->get(route('payment-receipts.print', $cancelled))
+        ->assertForbidden();
+});
+
+test('posted payment receipt print uses uploaded logo when present', function () {
+    Storage::fake('public');
+
+    $admin = User::factory()->administrator()->create();
+    $invoice = SalesInvoice::factory()->posted($admin)->create();
+
+    $settings = SystemSetting::current();
+    $path = UploadedFile::fake()->image('brand.png')->store('logos', 'public');
+    $settings->update(['logo_path' => $path]);
+
+    $posted = PaymentReceipt::factory()->posted($admin)->create();
+    PaymentReceiptAllocation::factory()->create([
+        'payment_receipt_id' => $posted->id,
+        'sales_invoice_id' => $invoice->id,
+        'amount' => 50,
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('payment-receipts.print', $posted))
+        ->assertSuccessful()
+        ->assertSee(Storage::disk('public')->url($path), false)
+        ->assertDontSee('/images/sdsm-logo.png', false);
 });

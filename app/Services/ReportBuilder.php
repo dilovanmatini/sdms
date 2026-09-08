@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\SalesInvoice;
 use App\Models\Supplier;
+use App\Support\MoneyDisplay;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 
@@ -134,7 +135,7 @@ class ReportBuilder
             ['key' => 'number', 'label' => 'الرقم'],
             ['key' => 'purchase_date', 'label' => 'التاريخ'],
             ['key' => 'supplier', 'label' => 'المورد'],
-            ['key' => 'lines_count', 'label' => 'عدد البنود'],
+            ['key' => 'lines_count', 'label' => 'عدد العناصر'],
             ['key' => 'status', 'label' => 'الحالة'],
         ];
 
@@ -185,9 +186,9 @@ class ReportBuilder
                 'number' => $invoice->number,
                 'invoice_date' => $invoice->invoice_date?->toDateString(),
                 'distributor' => $invoice->distributor?->name,
-                'subtotal' => number_format((float) $invoice->subtotal, 2, '.', ''),
-                'discount' => number_format((float) $invoice->discount, 2, '.', ''),
-                'grand_total' => number_format((float) $invoice->grand_total, 2, '.', ''),
+                'subtotal' => MoneyDisplay::format($invoice->subtotal),
+                'discount' => MoneyDisplay::format($invoice->discount),
+                'grand_total' => MoneyDisplay::format($invoice->grand_total),
             ])
             ->all();
 
@@ -219,7 +220,7 @@ class ReportBuilder
             ->map(fn (Distributor $distributor): array => [
                 'name' => $distributor->name,
                 'phone' => $distributor->phone,
-                'balance' => number_format((float) $balances[$distributor->id], 2, '.', ''),
+                'balance' => MoneyDisplay::format($balances[$distributor->id]),
             ])
             ->all();
 
@@ -253,7 +254,7 @@ class ReportBuilder
                 'receipt_date' => $receipt->receipt_date?->toDateString(),
                 'distributor' => $receipt->distributor?->name,
                 'payment_method' => $receipt->payment_method->label(),
-                'total_amount' => number_format((float) ($receipt->total_amount ?? 0), 2, '.', ''),
+                'total_amount' => MoneyDisplay::format($receipt->total_amount ?? 0),
             ])
             ->all();
 
@@ -284,7 +285,7 @@ class ReportBuilder
             ->map(fn ($row): array => [
                 'sale_date' => (string) $row->sale_date,
                 'invoices_count' => (string) $row->invoices_count,
-                'total_sales' => number_format((float) $row->total_sales, 2, '.', ''),
+                'total_sales' => MoneyDisplay::format($row->total_sales),
             ])
             ->all();
 
@@ -320,7 +321,7 @@ class ReportBuilder
             ->map(fn ($row): array => [
                 'sale_month' => (string) $row->sale_month,
                 'invoices_count' => (string) $row->invoices_count,
-                'total_sales' => number_format((float) $row->total_sales, 2, '.', ''),
+                'total_sales' => MoneyDisplay::format($row->total_sales),
             ])
             ->all();
 

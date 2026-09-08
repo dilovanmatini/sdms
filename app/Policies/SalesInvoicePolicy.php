@@ -25,16 +25,26 @@ class SalesInvoicePolicy
 
     public function update(User $user, SalesInvoice $salesInvoice): bool
     {
-        return $user->hasAbility(Ability::ManageSales) && ! $salesInvoice->isPosted();
+        return $user->hasAbility(Ability::ManageSales) && $salesInvoice->isDraft();
     }
 
     public function delete(User $user, SalesInvoice $salesInvoice): bool
     {
-        return $user->hasAbility(Ability::ManageSales) && ! $salesInvoice->isPosted();
+        return $user->hasAbility(Ability::ManageSales) && $salesInvoice->isDraft();
     }
 
     public function post(User $user, SalesInvoice $salesInvoice): bool
     {
-        return $user->hasAbility(Ability::ManageSales) && ! $salesInvoice->isPosted();
+        return $user->hasAbility(Ability::ManageSales) && $salesInvoice->isDraft();
+    }
+
+    public function cancel(User $user, SalesInvoice $salesInvoice): bool
+    {
+        return $user->hasAbility(Ability::ManageSales) && $salesInvoice->isPosted();
+    }
+
+    public function print(User $user, SalesInvoice $salesInvoice): bool
+    {
+        return $user->hasAbility(Ability::ManageSales) && $salesInvoice->isPosted();
     }
 }

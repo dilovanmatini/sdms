@@ -14,6 +14,7 @@ import { useState } from 'react';
 import AppLogo from '@/components/app-logo';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import { DistributorQuickSearch } from '@/components/distributor-quick-search';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
@@ -80,7 +81,10 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     ))}
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex min-w-0 flex-1 items-center justify-end gap-2 sm:gap-3">
+                    <div className="min-w-0 flex-1 sm:flex-none sm:w-72 md:w-80 lg:w-96">
+                        <DistributorQuickSearch />
+                    </div>
                     <div className="hidden items-center gap-2 md:flex">
                         {rightNavItems.map((item) => (
                             <a

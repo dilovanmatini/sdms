@@ -51,12 +51,12 @@ test('accountant can view customer statement with running balance', function () 
         ->assertInertia(fn ($page) => $page
             ->component('statements/index')
             ->where('statement.distributor.name', 'موزع الكشف')
-            ->where('statement.opening_balance', '0.00')
-            ->where('statement.closing_balance', '150.00')
+            ->where('statement.opening_balance', '0.00 $')
+            ->where('statement.closing_balance', '150.00 $')
             ->where('statement.entries.0.reference_number', 'INV-000111')
-            ->where('statement.entries.0.running_balance', '200.00')
+            ->where('statement.entries.0.running_balance', '200.00 $')
             ->where('statement.entries.1.reference_number', 'REC-000222')
-            ->where('statement.entries.1.running_balance', '150.00'));
+            ->where('statement.entries.1.running_balance', '150.00 $'));
 });
 
 test('statement opening balance includes activity before from date', function () {
@@ -89,8 +89,8 @@ test('statement opening balance includes activity before from date', function ()
         ]))
         ->assertSuccessful()
         ->assertInertia(fn ($page) => $page
-            ->where('statement.opening_balance', '100.00')
-            ->where('statement.closing_balance', '60.00')
+            ->where('statement.opening_balance', '100.00 $')
+            ->where('statement.closing_balance', '60.00 $')
             ->has('statement.entries', 1));
 });
 
@@ -114,7 +114,16 @@ test('print and pdf endpoints return statement document', function () {
     $this->actingAs($admin)
         ->get(route('statements.pdf', ['distributor_id' => $distributor->id]))
         ->assertSuccessful()
-        ->assertHeader('content-type', 'application/pdf');
+        ->assertHeader('content-type', 'application/pdf')
+        ->assertHeader('content-disposition');
+
+    $pdf = $this->actingAs($admin)
+        ->get(route('statements.pdf', ['distributor_id' => $distributor->id]))
+        ->getContent();
+
+    expect($pdf)
+        ->toStartWith('%PDF')
+        ->toContain('IBMPlexSansArabic');
 });
 
 test('warehouse role cannot view statements', function () {

@@ -4,24 +4,22 @@
     <meta charset="utf-8">
     <title>{{ $report['title'] }}</title>
     <style>
-        @font-face {
-            font-family: 'NotoSansArabic';
-            font-style: normal;
-            font-weight: 400;
-            src: url('{{ str_replace('\\', '/', resource_path('fonts/NotoSansArabic-Regular.ttf')) }}') format('truetype');
-        }
+        {!! \App\Support\PrintFont::faces(! empty($forPdf)) !!}
 
         body {
-            font-family: 'NotoSansArabic', DejaVu Sans, sans-serif;
+            font-family: {!! \App\Support\PrintFont::familyStack() !!};
             direction: rtl;
             color: #111827;
             font-size: 11px;
+            line-height: 1.55;
             margin: {{ !empty($forPdf) ? '18px' : '28px' }};
             background: #fff;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
-        h1 { font-size: 18px; margin: 0 0 4px; }
-        .meta { color: #4b5563; margin-bottom: 16px; }
+        h1 { font-size: 18px; margin: 0 0 4px; text-align: right; }
+        .meta { color: #4b5563; margin-bottom: 16px; text-align: right; }
 
         table {
             width: 100%;
@@ -76,10 +74,16 @@
         · عدد الصفوف: {{ $report['meta']['row_count'] }}
     </div>
 
+    @php
+        $columns = ! empty($forPdf)
+            ? array_reverse($report['columns'])
+            : $report['columns'];
+    @endphp
+
     <table>
         <thead>
             <tr>
-                @foreach ($report['columns'] as $column)
+                @foreach ($columns as $column)
                     <th>{{ $column['label'] }}</th>
                 @endforeach
             </tr>
@@ -87,13 +91,13 @@
         <tbody>
             @forelse ($report['rows'] as $row)
                 <tr>
-                    @foreach ($report['columns'] as $column)
+                    @foreach ($columns as $column)
                         <td>{{ $row[$column['key']] ?? '—' }}</td>
                     @endforeach
                 </tr>
             @empty
                 <tr>
-                    <td colspan="{{ count($report['columns']) }}" style="text-align:center;color:#6b7280;">
+                    <td colspan="{{ count($columns) }}" style="text-align:center;color:#6b7280;">
                         لا توجد بيانات
                     </td>
                 </tr>

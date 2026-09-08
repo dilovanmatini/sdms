@@ -70,4 +70,14 @@ class PaymentReceipt extends Model
     {
         return $this->status === DocumentStatus::Posted;
     }
+
+    public function isCancelled(): bool
+    {
+        return $this->status === DocumentStatus::Cancelled;
+    }
+
+    public function isDraft(): bool
+    {
+        return $this->status === DocumentStatus::Draft;
+    }
 }

@@ -4,34 +4,34 @@
     <meta charset="utf-8">
     <title>كشف حساب — {{ $statement['distributor']['name'] }}</title>
     <style>
-        @font-face {
-            font-family: 'NotoSansArabic';
-            font-style: normal;
-            font-weight: 400;
-            src: url('{{ str_replace('\\', '/', resource_path('fonts/NotoSansArabic-Regular.ttf')) }}') format('truetype');
-        }
+        {!! \App\Support\PrintFont::faces(! empty($forPdf)) !!}
 
         * {
             box-sizing: border-box;
         }
 
         body {
-            font-family: 'NotoSansArabic', DejaVu Sans, sans-serif;
+            font-family: {!! \App\Support\PrintFont::familyStack() !!};
             direction: rtl;
             color: #111827;
             font-size: 12px;
+            line-height: 1.6;
             margin: {{ !empty($forPdf) ? '24px' : '32px' }};
             background: #fff;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
         h1 {
             font-size: 20px;
             margin: 0 0 4px;
+            text-align: right;
         }
 
         .meta {
             color: #4b5563;
             margin-bottom: 20px;
+            text-align: right;
         }
 
         .grid {
@@ -42,6 +42,7 @@
         .grid td {
             vertical-align: top;
             padding: 2px 0;
+            text-align: right;
         }
 
         .label {
@@ -80,6 +81,7 @@
 
         .totals td {
             padding: 4px 0;
+            text-align: right;
         }
 
         .totals .value {
@@ -130,61 +132,80 @@
     <div class="meta">{{ $app_name }} · تاريخ الإصدار: {{ $generated_at }}</div>
 
     <table class="grid">
-        <tr>
-            <td class="label">الموزع</td>
-            <td>{{ $statement['distributor']['name'] }}</td>
-        </tr>
-        <tr>
-            <td class="label">جهة الاتصال</td>
-            <td>{{ $statement['distributor']['contact_person'] ?: '—' }}</td>
-        </tr>
-        <tr>
-            <td class="label">الهاتف</td>
-            <td>{{ $statement['distributor']['phone'] ?: '—' }}</td>
-        </tr>
-        <tr>
-            <td class="label">العنوان</td>
-            <td>{{ $statement['distributor']['address'] ?: '—' }}</td>
-        </tr>
-        <tr>
-            <td class="label">الفترة</td>
-            <td>
-                @if ($statement['from_date'] || $statement['to_date'])
-                    من {{ $statement['from_date'] ?: 'البداية' }}
-                    إلى {{ $statement['to_date'] ?: 'اليوم' }}
+        @foreach ([
+            ['الموزع', $statement['distributor']['name']],
+            ['جهة الاتصال', $statement['distributor']['contact_person'] ?: '—'],
+            ['الهاتف', $statement['distributor']['phone'] ?: '—'],
+            ['العنوان', $statement['distributor']['address'] ?: '—'],
+            ['الفترة', ($statement['from_date'] || $statement['to_date'])
+                ? 'من '.($statement['from_date'] ?: 'البداية').' إلى '.($statement['to_date'] ?: 'اليوم')
+                : 'كل الفترات'],
+        ] as [$label, $value])
+            <tr>
+                @if (! empty($forPdf))
+                    {{-- DomPDF does not reverse table columns for RTL --}}
+                    <td>{{ $value }}</td>
+                    <td class="label">{{ $label }}</td>
                 @else
-                    كل الفترات
+                    <td class="label">{{ $label }}</td>
+                    <td>{{ $value }}</td>
                 @endif
-            </td>
-        </tr>
+            </tr>
+        @endforeach
     </table>
+
+    @php
+        $entryColumns = [
+            ['key' => 'date', 'label' => 'التاريخ'],
+            ['key' => 'type', 'label' => 'النوع'],
+            ['key' => 'reference', 'label' => 'المرجع'],
+            ['key' => 'debit', 'label' => 'مدين', 'num' => true],
+            ['key' => 'credit', 'label' => 'دائن', 'num' => true],
+            ['key' => 'balance', 'label' => 'الرصيد الجاري', 'num' => true],
+        ];
+
+        if (! empty($forPdf)) {
+            $entryColumns = array_reverse($entryColumns);
+        }
+    @endphp
 
     <table class="entries">
         <thead>
             <tr>
-                <th>التاريخ</th>
-                <th>النوع</th>
-                <th>المرجع</th>
-                <th>مدين</th>
-                <th>دائن</th>
-                <th>الرصيد الجاري</th>
+                @foreach ($entryColumns as $column)
+                    <th>{{ $column['label'] }}</th>
+                @endforeach
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td colspan="3">رصيد افتتاحي</td>
-                <td class="num">—</td>
-                <td class="num">—</td>
-                <td class="num">{{ $statement['opening_balance'] }}</td>
+                @if (! empty($forPdf))
+                    <td class="num">{{ $statement['opening_balance'] }}</td>
+                    <td class="num">—</td>
+                    <td class="num">—</td>
+                    <td colspan="3">رصيد افتتاحي</td>
+                @else
+                    <td colspan="3">رصيد افتتاحي</td>
+                    <td class="num">—</td>
+                    <td class="num">—</td>
+                    <td class="num">{{ $statement['opening_balance'] }}</td>
+                @endif
             </tr>
             @forelse ($statement['entries'] as $entry)
+                @php
+                    $cells = [
+                        'date' => $entry['entry_date'],
+                        'type' => $entry['type_label'],
+                        'reference' => $entry['reference_number'] ?: '—',
+                        'debit' => $entry['debit'] !== \App\Support\MoneyDisplay::withSymbol('0.00') ? $entry['debit'] : '—',
+                        'credit' => $entry['credit'] !== \App\Support\MoneyDisplay::withSymbol('0.00') ? $entry['credit'] : '—',
+                        'balance' => $entry['running_balance'],
+                    ];
+                @endphp
                 <tr>
-                    <td>{{ $entry['entry_date'] }}</td>
-                    <td>{{ $entry['type_label'] }}</td>
-                    <td>{{ $entry['reference_number'] ?: '—' }}</td>
-                    <td class="num">{{ $entry['debit'] !== '0.00' ? $entry['debit'] : '—' }}</td>
-                    <td class="num">{{ $entry['credit'] !== '0.00' ? $entry['credit'] : '—' }}</td>
-                    <td class="num">{{ $entry['running_balance'] }}</td>
+                    @foreach ($entryColumns as $column)
+                        <td @class(['num' => ! empty($column['num'])])>{{ $cells[$column['key']] }}</td>
+                    @endforeach
                 </tr>
             @empty
                 <tr>
@@ -195,18 +216,21 @@
     </table>
 
     <table class="totals">
-        <tr>
-            <td>إجمالي المدين</td>
-            <td class="value num">{{ $statement['total_debit'] }}</td>
-        </tr>
-        <tr>
-            <td>إجمالي الدائن</td>
-            <td class="value num">{{ $statement['total_credit'] }}</td>
-        </tr>
-        <tr>
-            <td>الرصيد المتبقي</td>
-            <td class="value num">{{ $statement['closing_balance'] }}</td>
-        </tr>
+        @foreach ([
+            ['إجمالي المدين', $statement['total_debit']],
+            ['إجمالي الدائن', $statement['total_credit']],
+            ['الرصيد المتبقي', $statement['closing_balance']],
+        ] as [$label, $value])
+            <tr>
+                @if (! empty($forPdf))
+                    <td class="value num">{{ $value }}</td>
+                    <td>{{ $label }}</td>
+                @else
+                    <td>{{ $label }}</td>
+                    <td class="value num">{{ $value }}</td>
+                @endif
+            </tr>
+        @endforeach
     </table>
 </body>
 </html>

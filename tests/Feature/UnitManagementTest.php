@@ -14,12 +14,21 @@ test('administrator can manage units from settings', function () {
         ->assertOk();
 
     $this->actingAs($admin)
-        ->post(route('units.store'), [
+        ->get(route('units.create-edit'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('settings/units/create-edit')
+            ->where('unit', null));
+
+    $this->actingAs($admin)
+        ->from(route('units.create-edit'))
+        ->post(route('units.store-update'), [
             'name' => 'برميل',
             'symbol' => 'برم',
             'is_active' => true,
         ])
-        ->assertRedirect(route('units.index'));
+        ->assertSessionHasNoErrors()
+        ->assertRedirect();
 
     $this->assertDatabaseHas('units', [
         'name' => 'برميل',
@@ -72,7 +81,7 @@ test('product create requires an existing unit', function () {
     $category = Category::factory()->create();
 
     $this->actingAs($admin)
-        ->post(route('products.store'), [
+        ->post(route('products.store-update'), [
             'code' => 'PRD-UOM-1',
             'barcode' => null,
             'name_ar' => 'منتج بوحدة',
@@ -81,7 +90,7 @@ test('product create requires an existing unit', function () {
             'notes' => null,
             'is_active' => true,
         ])
-        ->assertRedirect(route('products.index'));
+        ->assertRedirect();
 
     $this->assertDatabaseHas('products', [
         'code' => 'PRD-UOM-1',

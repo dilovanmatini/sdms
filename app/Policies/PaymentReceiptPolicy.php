@@ -25,16 +25,26 @@ class PaymentReceiptPolicy
 
     public function update(User $user, PaymentReceipt $paymentReceipt): bool
     {
-        return $user->hasAbility(Ability::ManageReceipts) && ! $paymentReceipt->isPosted();
+        return $user->hasAbility(Ability::ManageReceipts) && $paymentReceipt->isDraft();
     }
 
     public function delete(User $user, PaymentReceipt $paymentReceipt): bool
     {
-        return $user->hasAbility(Ability::ManageReceipts) && ! $paymentReceipt->isPosted();
+        return $user->hasAbility(Ability::ManageReceipts) && $paymentReceipt->isDraft();
     }
 
     public function post(User $user, PaymentReceipt $paymentReceipt): bool
     {
-        return $user->hasAbility(Ability::ManageReceipts) && ! $paymentReceipt->isPosted();
+        return $user->hasAbility(Ability::ManageReceipts) && $paymentReceipt->isDraft();
+    }
+
+    public function cancel(User $user, PaymentReceipt $paymentReceipt): bool
+    {
+        return $user->hasAbility(Ability::ManageReceipts) && $paymentReceipt->isPosted();
+    }
+
+    public function print(User $user, PaymentReceipt $paymentReceipt): bool
+    {
+        return $user->hasAbility(Ability::ManageReceipts) && $paymentReceipt->isPosted();
     }
 }

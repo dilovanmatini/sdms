@@ -18,16 +18,20 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
 
-    Route::resource('settings/units', UnitController::class)
-        ->except(['show'])
-        ->parameters(['units' => 'unit'])
-        ->names('units');
+    Route::group(['prefix' => 'settings/units'], function () {
+        Route::get('/', [UnitController::class, 'index'])->name('units.index');
+        Route::get('create-edit/{unit?}', [UnitController::class, 'createEdit'])->name('units.create-edit');
+        Route::post('{unit?}', [UnitController::class, 'storeUpdate'])->name('units.store-update');
+        Route::delete('{unit}', [UnitController::class, 'destroy'])->name('units.destroy');
+    });
 
-    Route::resource('settings/users', UserController::class)
-        ->except(['show'])
-        ->names('users');
+    Route::group(['prefix' => 'settings/users'], function () {
+        Route::get('/', [UserController::class, 'index'])->name('users.index');
+        Route::get('create-edit/{user?}', [UserController::class, 'createEdit'])->name('users.create-edit');
+        Route::post('{user?}', [UserController::class, 'storeUpdate'])->name('users.store-update');
+        Route::delete('{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    });
 });
-
 Route::middleware(['auth'])->group(function () {
     Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 

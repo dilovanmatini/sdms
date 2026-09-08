@@ -4,7 +4,7 @@
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source inline('bg-[position:left_12px_center]', 'start-0', 'end-0', 'end-4', 'ps-2.5', 'ps-3', 'ps-8', 'ps-10', 'pe-3', 'pe-10', 'ms-2', 'ms-3', 'ms-auto', 'me-2', 'me-3', 'rounded-s-md', 'rounded-e-lg', 'border-e-0', 'border-s', 'border-e', 'text-start', 'justify-start', 'justify-center', 'truncate', 'sticky', 'top-0', 'shrink-0', 'min-w-0', 'min-h-0', 'min-w-56', 'size-4', 'rounded-lg', 'w-16', 'w-64', 'px-2', 'px-4', 'h-5', 'w-5', 'text-sm', 'font-medium');
+@source inline('bg-[position:left_12px_center]', 'start-0', 'end-0', 'end-4', 'ps-2.5', 'ps-3', 'ps-8', 'ps-10', 'pe-3', 'pe-10', 'ms-2', 'ms-3', 'ms-auto', 'me-2', 'me-3', 'rounded-s-md', 'rounded-e-lg', 'border-e-0', 'border-s', 'border-e', 'text-start', 'justify-start', 'justify-center', 'truncate', 'sticky', 'top-0', 'shrink-0', 'min-w-0', 'min-h-0', 'min-w-56', 'size-4', 'rounded-lg', 'w-16', 'w-64', 'px-2', 'px-4', 'h-5', 'w-5', 'text-sm', 'font-medium', 'max-h-48', 'inset-x-0', 'z-20', 'mt-1', 'overflow-y-auto', 'overflow-hidden', 'h-px', 'w-px', 'opacity-0', 'pointer-events-none', 'sr-only', 'shadow-focus', 'focus:shadow-focus', 'focus-visible:shadow-focus', 'group-focus-visible:shadow-focus', 'focus:ring-0', 'focus:ring-offset-0', 'group-focus:ring-0');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -24,6 +24,9 @@
     --color-primary-700: #1d4ed8;
     --color-primary-800: #1e40af;
     --color-primary-900: #1e3a8a;
+
+    /* Soft focus glow — prefer over Flowbite's thick focus:ring-* */
+    --shadow-focus: 0 0 0 2px rgb(0 0 0 / 0.2);
 }
 
 @layer base {
