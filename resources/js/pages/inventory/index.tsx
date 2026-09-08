@@ -11,14 +11,16 @@ import {
 } from 'flowbite-react';
 import { Warehouse } from 'lucide-react';
 import {
-    AsyncSearchableSelect,
-    type SearchableSelectOption,
+    AsyncSearchableSelect
+    
 } from '@/components/async-searchable-select';
+import type {SearchableSelectOption} from '@/components/async-searchable-select';
 import { FormCard } from '@/components/form-card';
 import {
-    PaginationLinks,
-    type Paginated,
+    PaginationLinks
+    
 } from '@/components/pagination-links';
+import type {Paginated} from '@/components/pagination-links';
 import { SearchFilter } from '@/components/search-filter';
 import { lookupQuery } from '@/hooks/use-lookup-options';
 import { index } from '@/routes/inventory';

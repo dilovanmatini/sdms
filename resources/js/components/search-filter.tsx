@@ -1,7 +1,8 @@
 import { router } from '@inertiajs/react';
 import { Label, TextInput } from 'flowbite-react';
 import { Search } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
+import { useState  } from 'react';
+import type {FormEvent} from 'react';
 import { cn } from '@/lib/utils';
 
 type Props = {

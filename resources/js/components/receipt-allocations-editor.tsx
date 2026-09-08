@@ -1,9 +1,10 @@
 import { Button, Label, TextInput } from 'flowbite-react';
 import { Plus, Trash2 } from 'lucide-react';
 import {
-    AsyncSearchableSelect,
-    type SearchableSelectOption,
+    AsyncSearchableSelect
+    
 } from '@/components/async-searchable-select';
+import type {SearchableSelectOption} from '@/components/async-searchable-select';
 import InputError from '@/components/input-error';
 import { lookupQuery } from '@/hooks/use-lookup-options';
 import { useCurrency, useFormatMoney } from '@/lib/money';

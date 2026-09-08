@@ -13,8 +13,8 @@ import { useState } from 'react';
 import GeneralSettingsController from '@/actions/App/Http/Controllers/Settings/GeneralSettingsController';
 import { FormActions, FormCard } from '@/components/form-card';
 import InputError from '@/components/input-error';
-import { edit } from '@/routes/settings/general';
 import { index as settingsIndex } from '@/routes/settings';
+import { edit } from '@/routes/settings/general';
 
 type Settings = {
     app_name: string;
@@ -125,6 +125,7 @@ export default function GeneralSettings({
 
                                             if (file === null) {
                                                 setPreviewUrl(settings.logo_url);
+
                                                 return;
                                             }
 

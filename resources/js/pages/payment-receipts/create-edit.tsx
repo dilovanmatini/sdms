@@ -5,17 +5,19 @@ import type { FormEvent } from 'react';
 import { useMemo } from 'react';
 import PaymentReceiptController from '@/actions/App/Http/Controllers/PaymentReceiptController';
 import {
-    AsyncSearchableSelect,
-    type SearchableSelectOption,
+    AsyncSearchableSelect
+    
 } from '@/components/async-searchable-select';
+import type {SearchableSelectOption} from '@/components/async-searchable-select';
 import { ConfirmActionButton } from '@/components/confirm-action-button';
 import { DocumentStatusBadge } from '@/components/document-status-badge';
 import { FormActions, FormCard } from '@/components/form-card';
 import InputError from '@/components/input-error';
 import {
-    ReceiptAllocationsEditor,
-    type ReceiptAllocationDraft,
+    ReceiptAllocationsEditor
+    
 } from '@/components/receipt-allocations-editor';
+import type {ReceiptAllocationDraft} from '@/components/receipt-allocations-editor';
 import { lookupQuery } from '@/hooks/use-lookup-options';
 import { distributors as distributorLookups } from '@/routes/lookups';
 import { createEdit, index, print as paymentReceiptsPrint } from '@/routes/payment-receipts';

@@ -16,7 +16,7 @@ import {
     Search,
     Users,
 } from 'lucide-react';
-import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { SearchableSelectOption } from '@/components/searchable-select';
 import { lookupQuery, useLookupOptions } from '@/hooks/use-lookup-options';
@@ -288,6 +288,12 @@ export function DistributorQuickSearch() {
             distributorLookups.url(lookupQuery(search, { limit: 15 })),
     });
 
+    const openModal = useCallback(() => {
+        setOpen(true);
+        setHasSearched(true);
+        onSearch('');
+    }, [onSearch]);
+
     useEffect(() => {
         if (!canSearch) {
             return;
@@ -296,25 +302,14 @@ export function DistributorQuickSearch() {
         const onKeyDown = (event: KeyboardEvent) => {
             if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
                 event.preventDefault();
-                setOpen(true);
+                openModal();
             }
         };
 
         document.addEventListener('keydown', onKeyDown);
 
         return () => document.removeEventListener('keydown', onKeyDown);
-    }, [canSearch]);
-
-    useEffect(() => {
-        if (!open) {
-            return;
-        }
-
-        setHasSearched(true);
-        onSearch('');
-        // Intentionally only when the modal opens.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [open]);
+    }, [canSearch, openModal]);
 
     useEffect(() => {
         return () => {
@@ -360,7 +355,7 @@ export function DistributorQuickSearch() {
         <>
             <button
                 type="button"
-                onClick={() => setOpen(true)}
+                onClick={openModal}
                 aria-label="بحث عن موزع"
                 data-test="distributor-quick-search"
                 className={cn(

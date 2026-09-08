@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Category\CreateEditAction;
-use App\Actions\Category\IndexAction;
 use App\Actions\Category\DestroyAction;
+use App\Actions\Category\IndexAction;
 use App\Actions\Category\StoreUpdateAction;
 use App\Http\Requests\StoreUpdateCategoryRequest;
 use App\Models\Category;
