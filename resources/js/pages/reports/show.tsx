@@ -14,6 +14,7 @@ import {
     ChartColumn,
     FileDown,
     FileSpreadsheet,
+    type LucideIcon,
     Package,
     Printer,
     Search,
@@ -22,7 +23,7 @@ import {
     Users,
     Wallet,
 } from 'lucide-react';
-import type { ComponentType, FormEvent } from 'react';
+import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { FormCard } from '@/components/form-card';
 import {
@@ -58,7 +59,7 @@ type Props = {
     uses_date_range: boolean;
 };
 
-const icons: Record<string, ComponentType<{ className?: string }>> = {
+const icons: Record<string, LucideIcon> = {
     inventory: Package,
     suppliers: Truck,
     purchases: ShoppingCart,
