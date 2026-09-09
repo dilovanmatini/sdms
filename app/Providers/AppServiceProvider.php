@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Throwable;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -61,11 +62,15 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function configureAppNameFromSettings(): void
     {
-        if (! Schema::hasTable('system_settings')) {
+        try {
+            if (! Schema::hasTable('system_settings')) {
+                return;
+            }
+
+            $settings = SystemSetting::query()->first();
+        } catch (Throwable) {
             return;
         }
-
-        $settings = SystemSetting::query()->first();
 
         if ($settings === null) {
             return;
