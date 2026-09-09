@@ -14,7 +14,6 @@ import {
     ChartColumn,
     FileDown,
     FileSpreadsheet,
-    type LucideIcon,
     Package,
     Printer,
     Search,
@@ -23,6 +22,7 @@ import {
     Users,
     Wallet,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { FormCard } from '@/components/form-card';
