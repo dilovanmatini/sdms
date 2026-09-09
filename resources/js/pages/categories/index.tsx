@@ -135,7 +135,9 @@ export default function CategoriesIndex({
                                                     <Button
                                                         as={Link}
                                                         href={toUrl(
-                                                            createEdit(category.id),
+                                                            createEdit(
+                                                                category.id,
+                                                            ),
                                                         )}
                                                         size="xs"
                                                         color="light"
@@ -162,7 +164,10 @@ export default function CategoriesIndex({
                         </Table>
                     </div>
 
-                    <PaginationLinks meta={categories} storageKey="categories" />
+                    <PaginationLinks
+                        meta={categories}
+                        storageKey="categories"
+                    />
                 </div>
             </FormCard>
         </>

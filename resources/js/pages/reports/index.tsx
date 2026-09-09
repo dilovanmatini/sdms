@@ -53,7 +53,7 @@ export default function ReportsIndex({ reports }: Props) {
                             <Link
                                 key={report.type}
                                 href={toUrl(reportsShow(report.type))}
-                                className="block rounded-lg focus:outline-none focus:ring-0 focus-visible:shadow-focus"
+                                className="block rounded-lg focus:ring-0 focus:outline-none focus-visible:shadow-focus"
                             >
                                 <Card className="h-full transition hover:bg-gray-50 dark:hover:bg-gray-800">
                                     <div className="flex items-start gap-3">

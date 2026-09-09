@@ -20,8 +20,8 @@ import { useMemo, useState } from 'react';
 import AppLogo from '@/components/app-logo';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { NavFooter } from '@/components/nav-footer';
-import { NavMain  } from '@/components/nav-main';
-import type {NavGroup} from '@/components/nav-main';
+import { NavMain } from '@/components/nav-main';
+import type { NavGroup } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
@@ -161,8 +161,7 @@ export function AppSidebar() {
             .map((group) => ({
                 ...group,
                 items: group.items.filter(
-                    (item) =>
-                        !item.ability || abilities.includes(item.ability),
+                    (item) => !item.ability || abilities.includes(item.ability),
                 ),
             }))
             .filter((group) => group.items.length > 0);
@@ -179,7 +178,7 @@ export function AppSidebar() {
             <>
                 <button
                     type="button"
-                    className="fixed top-3 inset-e-3 z-40 inline-flex items-center rounded-lg p-2 text-sm text-gray-500 hover:bg-gray-100 focus:ring-0 focus-visible:shadow-focus focus:outline-none md:hidden dark:text-gray-400 dark:hover:bg-gray-700"
+                    className="fixed inset-e-3 top-3 z-40 inline-flex items-center rounded-lg p-2 text-sm text-gray-500 hover:bg-gray-100 focus:ring-0 focus:outline-none focus-visible:shadow-focus md:hidden dark:text-gray-400 dark:hover:bg-gray-700"
                     onClick={() => setMobileOpen(true)}
                     aria-label="فتح القائمة"
                 >
@@ -231,9 +230,7 @@ export function AppSidebar() {
                 item: {
                     base: cn(
                         'flex items-center rounded-lg px-2 py-1.5 text-sm font-medium text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700',
-                        collapsed
-                            ? 'justify-center'
-                            : 'w-full justify-start',
+                        collapsed ? 'justify-center' : 'w-full justify-start',
                     ),
                     listItem: collapsed ? 'flex w-full justify-center' : '',
                 },
@@ -278,9 +275,7 @@ export function AppSidebar() {
                         type="button"
                         onClick={toggleCollapsed}
                         className="shrink-0 rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        aria-label={
-                            collapsed ? 'توسيع القائمة' : 'طي القائمة'
-                        }
+                        aria-label={collapsed ? 'توسيع القائمة' : 'طي القائمة'}
                     >
                         <Menu className="h-5 w-5" />
                     </button>

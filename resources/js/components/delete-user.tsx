@@ -1,5 +1,12 @@
 import { Form } from '@inertiajs/react';
-import { Button, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'flowbite-react';
+import {
+    Button,
+    Label,
+    Modal,
+    ModalBody,
+    ModalFooter,
+    ModalHeader,
+} from 'flowbite-react';
 import { TriangleAlert } from 'lucide-react';
 import { useRef, useState } from 'react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
@@ -34,9 +41,7 @@ export default function DeleteUser() {
                 </Button>
 
                 <Modal show={open} onClose={() => setOpen(false)} dismissible>
-                    <ModalHeader>
-                        هل أنت متأكد أنك تريد حذف حسابك؟
-                    </ModalHeader>
+                    <ModalHeader>هل أنت متأكد أنك تريد حذف حسابك؟</ModalHeader>
                     <ModalBody>
                         <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
                             بمجرد حذف حسابك، سيتم حذف جميع موارده وبياناته بشكل

@@ -82,7 +82,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                 </div>
 
                 <div className="flex min-w-0 flex-1 items-center justify-end gap-2 sm:gap-3">
-                    <div className="min-w-0 flex-1 sm:flex-none sm:w-72 md:w-80 lg:w-96">
+                    <div className="min-w-0 flex-1 sm:w-72 sm:flex-none md:w-80 lg:w-96">
                         <DistributorQuickSearch />
                     </div>
                     <div className="hidden items-center gap-2 md:flex">
@@ -134,7 +134,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
             >
                 <DrawerHeader
                     title="القائمة"
-                        titleIcon={() => <AppLogoIcon className="h-5 w-5" />}
+                    titleIcon={() => <AppLogoIcon className="h-5 w-5" />}
                     closeIcon={X}
                 />
                 <DrawerItems>

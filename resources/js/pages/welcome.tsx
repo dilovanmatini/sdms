@@ -27,7 +27,11 @@ export default function Welcome() {
                                 الصفحة الرئيسية
                             </Button>
                         ) : (
-                            <Button as={Link} href={toUrl(login())} color="light">
+                            <Button
+                                as={Link}
+                                href={toUrl(login())}
+                                color="light"
+                            >
                                 تسجيل الدخول
                             </Button>
                         )}

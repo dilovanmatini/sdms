@@ -1,12 +1,6 @@
 import { Spinner, TextInput } from 'flowbite-react';
 import { Check, ChevronDown, Search } from 'lucide-react';
-import {
-    useEffect,
-    useId,
-    useMemo,
-    useRef,
-    useState,
-} from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -22,10 +16,7 @@ type Props = {
     options: SearchableSelectOption[];
     defaultValue?: string | number | null;
     value?: string | number | null;
-    onChange?: (
-        value: string,
-        option?: SearchableSelectOption | null,
-    ) => void;
+    onChange?: (value: string, option?: SearchableSelectOption | null) => void;
     placeholder?: string;
     searchPlaceholder?: string;
     required?: boolean;
@@ -99,9 +90,7 @@ export function SearchableSelect({
     const [activeIndex, setActiveIndex] = useState(0);
 
     const isControlled = value !== undefined;
-    const selectedValue = isControlled
-        ? toStringValue(value)
-        : internalValue;
+    const selectedValue = isControlled ? toStringValue(value) : internalValue;
 
     const optionLabel = findLabel(options, selectedValue);
     const selectedLabel = optionLabel !== '' ? optionLabel : cachedLabel;
@@ -279,9 +268,7 @@ export function SearchableSelect({
                     selectedLabel !== '' &&
                     !options.some(
                         (option) => String(option.value) === selectedValue,
-                    ) && (
-                        <option value={selectedValue}>{selectedLabel}</option>
-                    )}
+                    ) && <option value={selectedValue}>{selectedLabel}</option>}
                 {options.map((option) => (
                     <option key={option.value} value={option.value}>
                         {option.label}
@@ -297,7 +284,7 @@ export function SearchableSelect({
                 aria-controls={listboxId}
                 className={cn(
                     'relative flex min-h-10.5 w-full cursor-pointer items-center justify-between gap-2 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-start text-sm leading-5',
-                    'focus:border-gray-300 focus:ring-0 focus:shadow-focus focus:outline-none',
+                    'focus:border-gray-300 focus:shadow-focus focus:ring-0 focus:outline-none',
                     'disabled:cursor-not-allowed disabled:opacity-50',
                     'dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-gray-600',
                     selectedValue !== '' && selectedLabel !== ''

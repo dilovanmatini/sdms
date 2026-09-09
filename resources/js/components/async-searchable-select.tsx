@@ -1,9 +1,6 @@
 import { useMemo } from 'react';
-import {
-    SearchableSelect
-    
-} from '@/components/searchable-select';
-import type {SearchableSelectOption} from '@/components/searchable-select';
+import { SearchableSelect } from '@/components/searchable-select';
+import type { SearchableSelectOption } from '@/components/searchable-select';
 import { useLookupOptions } from '@/hooks/use-lookup-options';
 
 type Props = {

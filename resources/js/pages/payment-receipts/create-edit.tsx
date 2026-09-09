@@ -4,23 +4,21 @@ import { Edit, Printer, Wallet } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useMemo } from 'react';
 import PaymentReceiptController from '@/actions/App/Http/Controllers/PaymentReceiptController';
-import {
-    AsyncSearchableSelect
-    
-} from '@/components/async-searchable-select';
-import type {SearchableSelectOption} from '@/components/async-searchable-select';
+import { AsyncSearchableSelect } from '@/components/async-searchable-select';
+import type { SearchableSelectOption } from '@/components/async-searchable-select';
 import { ConfirmActionButton } from '@/components/confirm-action-button';
 import { DocumentStatusBadge } from '@/components/document-status-badge';
 import { FormActions, FormCard } from '@/components/form-card';
 import InputError from '@/components/input-error';
-import {
-    ReceiptAllocationsEditor
-    
-} from '@/components/receipt-allocations-editor';
-import type {ReceiptAllocationDraft} from '@/components/receipt-allocations-editor';
+import { ReceiptAllocationsEditor } from '@/components/receipt-allocations-editor';
+import type { ReceiptAllocationDraft } from '@/components/receipt-allocations-editor';
 import { lookupQuery } from '@/hooks/use-lookup-options';
 import { distributors as distributorLookups } from '@/routes/lookups';
-import { createEdit, index, print as paymentReceiptsPrint } from '@/routes/payment-receipts';
+import {
+    createEdit,
+    index,
+    print as paymentReceiptsPrint,
+} from '@/routes/payment-receipts';
 
 type Props = {
     receipt: {
@@ -81,16 +79,13 @@ export default function PaymentReceiptsCreateEdit({
         payment_method:
             receipt?.payment_method ?? payment_methods[0]?.value ?? 'cash',
         notes: receipt?.notes ?? '',
-                        allocations: receipt
-                            ? receipt.allocations.map((allocation) => ({
-                                  sales_invoice_id: String(
-                                      allocation.sales_invoice_id,
-                                  ),
-                                  amount: allocation.amount,
-                                  grand_total:
-                                      allocation.invoice?.grand_total,
-                              }))
-                            : [{ sales_invoice_id: '', amount: '' }],
+        allocations: receipt
+            ? receipt.allocations.map((allocation) => ({
+                  sales_invoice_id: String(allocation.sales_invoice_id),
+                  amount: allocation.amount,
+                  grand_total: allocation.invoice?.grand_total,
+              }))
+            : [{ sales_invoice_id: '', amount: '' }],
     });
 
     const invoiceIncludeIds = useMemo(
@@ -254,7 +249,6 @@ export default function PaymentReceiptsCreateEdit({
                             form.setData('allocations', allocations)
                         }
                     />
-
                 </form>
 
                 {can_edit && (

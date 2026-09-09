@@ -53,10 +53,7 @@ export function ActiveStatusFilter({
                 onChange={(event) => apply(event.target.value)}
             >
                 {options.map((option) => (
-                    <option
-                        key={option.value || 'all'}
-                        value={option.value}
-                    >
+                    <option key={option.value || 'all'} value={option.value}>
                         {option.label}
                     </option>
                 ))}

@@ -28,9 +28,7 @@ function mergeOptions(
 
     return [
         ...pinned,
-        ...remote.filter(
-            (option) => !pinnedIds.has(String(option.value)),
-        ),
+        ...remote.filter((option) => !pinnedIds.has(String(option.value))),
     ];
 }
 

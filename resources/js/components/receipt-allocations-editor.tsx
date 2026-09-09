@@ -1,10 +1,7 @@
 import { Button, Label, TextInput } from 'flowbite-react';
 import { Plus, Trash2 } from 'lucide-react';
-import {
-    AsyncSearchableSelect
-    
-} from '@/components/async-searchable-select';
-import type {SearchableSelectOption} from '@/components/async-searchable-select';
+import { AsyncSearchableSelect } from '@/components/async-searchable-select';
+import type { SearchableSelectOption } from '@/components/async-searchable-select';
 import InputError from '@/components/input-error';
 import { lookupQuery } from '@/hooks/use-lookup-options';
 import { useCurrency, useFormatMoney } from '@/lib/money';
@@ -139,41 +136,40 @@ export function ReceiptAllocationsEditor({
                                                     option?.meta?.grand_total;
 
                                                 onChange(
-                                                    allocations.map(
-                                                        (row, i) =>
-                                                            i === index
-                                                                ? {
-                                                                      sales_invoice_id:
-                                                                          value,
-                                                                      amount:
-                                                                          nextRemaining !==
-                                                                              undefined &&
-                                                                          nextRemaining !==
-                                                                              null
-                                                                              ? String(
-                                                                                    nextRemaining,
-                                                                                )
-                                                                              : row.amount,
-                                                                      remaining:
-                                                                          nextRemaining !==
-                                                                              undefined &&
-                                                                          nextRemaining !==
-                                                                              null
-                                                                              ? String(
-                                                                                    nextRemaining,
-                                                                                )
-                                                                              : row.remaining,
-                                                                      grand_total:
-                                                                          nextGrandTotal !==
-                                                                              undefined &&
-                                                                          nextGrandTotal !==
-                                                                              null
-                                                                              ? String(
-                                                                                    nextGrandTotal,
-                                                                                )
-                                                                              : row.grand_total,
-                                                                  }
-                                                                : row,
+                                                    allocations.map((row, i) =>
+                                                        i === index
+                                                            ? {
+                                                                  sales_invoice_id:
+                                                                      value,
+                                                                  amount:
+                                                                      nextRemaining !==
+                                                                          undefined &&
+                                                                      nextRemaining !==
+                                                                          null
+                                                                          ? String(
+                                                                                nextRemaining,
+                                                                            )
+                                                                          : row.amount,
+                                                                  remaining:
+                                                                      nextRemaining !==
+                                                                          undefined &&
+                                                                      nextRemaining !==
+                                                                          null
+                                                                          ? String(
+                                                                                nextRemaining,
+                                                                            )
+                                                                          : row.remaining,
+                                                                  grand_total:
+                                                                      nextGrandTotal !==
+                                                                          undefined &&
+                                                                      nextGrandTotal !==
+                                                                          null
+                                                                          ? String(
+                                                                                nextGrandTotal,
+                                                                            )
+                                                                          : row.grand_total,
+                                                              }
+                                                            : row,
                                                     ),
                                                 );
                                             }}
@@ -251,11 +247,9 @@ export function ReceiptAllocationsEditor({
 
                                 {hasInvoiceMeta && (
                                     <p className="text-xs text-gray-500">
-                                        {allocation.grand_total !==
-                                            undefined &&
+                                        {allocation.grand_total !== undefined &&
                                             `إجمالي الفاتورة ${allocation.grand_total}`}
-                                        {allocation.grand_total !==
-                                            undefined &&
+                                        {allocation.grand_total !== undefined &&
                                             allocation.remaining !==
                                                 undefined &&
                                             ' · '}

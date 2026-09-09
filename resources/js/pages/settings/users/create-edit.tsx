@@ -26,9 +26,7 @@ export default function UsersCreateEdit({ user, roles }: Props) {
             <Head title={user ? 'تعديل مستخدم' : 'إضافة مستخدم'} />
             <FormCard
                 title={user ? 'تعديل مستخدم' : 'إضافة مستخدم'}
-                description={
-                    user ? user.name : 'إنشاء حساب مستخدم جديد'
-                }
+                description={user ? user.name : 'إنشاء حساب مستخدم جديد'}
                 icon={user ? Edit : UserCog}
             >
                 <Form
@@ -81,7 +79,9 @@ export default function UsersCreateEdit({ user, roles }: Props) {
                                         id="role"
                                         name="role"
                                         required
-                                        defaultValue={user?.role ?? roles[0]?.value}
+                                        defaultValue={
+                                            user?.role ?? roles[0]?.value
+                                        }
                                     >
                                         {roles.map((role) => (
                                             <option
@@ -138,9 +138,7 @@ export default function UsersCreateEdit({ user, roles }: Props) {
                                 }
                             >
                                 <Button type="submit" disabled={processing}>
-                                    {user
-                                        ? 'حفظ التعديلات'
-                                        : 'إنشاء المستخدم'}
+                                    {user ? 'حفظ التعديلات' : 'إنشاء المستخدم'}
                                 </Button>
                             </FormActions>
                         </>

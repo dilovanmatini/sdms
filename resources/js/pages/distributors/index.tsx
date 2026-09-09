@@ -8,18 +8,15 @@ import {
     TableHeadCell,
     TableRow,
 } from 'flowbite-react';
-import { Pencil, Plus, Users } from 'lucide-react';
+import { Plus, Users } from 'lucide-react';
 import DistributorController from '@/actions/App/Http/Controllers/DistributorController';
 import { ActiveBadge } from '@/components/active-badge';
 import { ActiveStatusFilter } from '@/components/active-status-filter';
 import type { ActiveStatusOption } from '@/components/active-status-filter';
-import { DeleteButton } from '@/components/delete-button';
+import { DistributorActionsMenu } from '@/components/distributor-actions-menu';
 import { FormCard } from '@/components/form-card';
-import {
-    PaginationLinks
-    
-} from '@/components/pagination-links';
-import type {Paginated} from '@/components/pagination-links';
+import { PaginationLinks } from '@/components/pagination-links';
+import type { Paginated } from '@/components/pagination-links';
 import { SearchFilter } from '@/components/search-filter';
 import { toUrl } from '@/lib/utils';
 import { createEdit, index } from '@/routes/distributors';
@@ -143,31 +140,21 @@ export default function DistributorsIndex({
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-end">
-                                                <div className="inline-flex items-center justify-end gap-2">
-                                                    <Button
-                                                        as={Link}
-                                                        href={toUrl(
-                                                            createEdit(
-                                                                distributor.id,
-                                                            ),
-                                                        )}
-                                                        size="xs"
-                                                        color="light"
-                                                        title="تعديل"
-                                                        aria-label="تعديل"
-                                                        className="inline-flex items-center justify-center p-2"
-                                                    >
-                                                        <Pencil className="h-3.5 w-3.5" />
-                                                    </Button>
-                                                    <DeleteButton
-                                                        href={DistributorController.destroy.url(
-                                                            distributor.id,
-                                                        )}
-                                                        disabled={
-                                                            !distributor.can_delete
-                                                        }
-                                                    />
-                                                </div>
+                                                <DistributorActionsMenu
+                                                    distributorId={
+                                                        distributor.id
+                                                    }
+                                                    distributorLabel={
+                                                        distributor.name
+                                                    }
+                                                    buttonSize="xs"
+                                                    deleteHref={DistributorController.destroy.url(
+                                                        distributor.id,
+                                                    )}
+                                                    canDelete={
+                                                        distributor.can_delete
+                                                    }
+                                                />
                                             </TableCell>
                                         </TableRow>
                                     ))
@@ -176,7 +163,10 @@ export default function DistributorsIndex({
                         </Table>
                     </div>
 
-                    <PaginationLinks meta={distributors} storageKey="distributors" />
+                    <PaginationLinks
+                        meta={distributors}
+                        storageKey="distributors"
+                    />
                 </div>
             </FormCard>
         </>

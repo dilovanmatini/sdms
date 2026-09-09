@@ -3,20 +3,14 @@ import { Button, Label, Textarea, TextInput } from 'flowbite-react';
 import { Edit, ShoppingCart } from 'lucide-react';
 import type { FormEvent } from 'react';
 import PurchaseController from '@/actions/App/Http/Controllers/PurchaseController';
-import {
-    AsyncSearchableSelect
-    
-} from '@/components/async-searchable-select';
-import type {SearchableSelectOption} from '@/components/async-searchable-select';
+import { AsyncSearchableSelect } from '@/components/async-searchable-select';
+import type { SearchableSelectOption } from '@/components/async-searchable-select';
 import { ConfirmActionButton } from '@/components/confirm-action-button';
 import { DocumentStatusBadge } from '@/components/document-status-badge';
 import { FormActions, FormCard } from '@/components/form-card';
 import InputError from '@/components/input-error';
-import {
-    PurchaseLinesEditor
-    
-} from '@/components/purchase-lines-editor';
-import type {PurchaseLineDraft} from '@/components/purchase-lines-editor';
+import { PurchaseLinesEditor } from '@/components/purchase-lines-editor';
+import type { PurchaseLineDraft } from '@/components/purchase-lines-editor';
 import { lookupQuery } from '@/hooks/use-lookup-options';
 import { suppliers as supplierLookups } from '@/routes/lookups';
 import { createEdit, index } from '@/routes/purchases';
@@ -153,9 +147,7 @@ export default function PurchasesCreateEdit({
                                 searchPlaceholder="ابحث عن مورد..."
                                 value={form.data.supplier_id}
                                 initialOptions={
-                                    selected_supplier
-                                        ? [selected_supplier]
-                                        : []
+                                    selected_supplier ? [selected_supplier] : []
                                 }
                                 buildUrl={(search) =>
                                     supplierLookups.url(
@@ -249,11 +241,7 @@ export default function PurchasesCreateEdit({
                                         إلغاء فاتورة مشتريات
                                     </ConfirmActionButton>
                                 )}
-                                <Button
-                                    color="light"
-                                    href={index.url()}
-                                    as="a"
-                                >
+                                <Button color="light" href={index.url()} as="a">
                                     رجوع
                                 </Button>
                             </>

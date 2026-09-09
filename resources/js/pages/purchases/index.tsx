@@ -13,20 +13,14 @@ import {
 } from 'flowbite-react';
 import { Ban, Pencil, Plus, ShoppingCart } from 'lucide-react';
 import PurchaseController from '@/actions/App/Http/Controllers/PurchaseController';
-import {
-    AsyncSearchableSelect
-    
-} from '@/components/async-searchable-select';
-import type {SearchableSelectOption} from '@/components/async-searchable-select';
+import { AsyncSearchableSelect } from '@/components/async-searchable-select';
+import type { SearchableSelectOption } from '@/components/async-searchable-select';
 import { ConfirmActionButton } from '@/components/confirm-action-button';
 import { DeleteButton } from '@/components/delete-button';
 import { DocumentStatusBadge } from '@/components/document-status-badge';
 import { FormCard } from '@/components/form-card';
-import {
-    PaginationLinks
-    
-} from '@/components/pagination-links';
-import type {Paginated} from '@/components/pagination-links';
+import { PaginationLinks } from '@/components/pagination-links';
+import type { Paginated } from '@/components/pagination-links';
 import { SearchFilter } from '@/components/search-filter';
 import { lookupQuery } from '@/hooks/use-lookup-options';
 import { toUrl } from '@/lib/utils';
@@ -75,9 +69,7 @@ export default function PurchasesIndex({
     filters,
     status_options,
 }: Props) {
-    const supplierId = filters.supplier_id
-        ? String(filters.supplier_id)
-        : '';
+    const supplierId = filters.supplier_id ? String(filters.supplier_id) : '';
 
     const filterParams = {
         status: filters.status || undefined,
@@ -277,9 +269,7 @@ export default function PurchasesIndex({
                                             <TableCell className="text-start font-medium">
                                                 <Link
                                                     href={toUrl(
-                                                        createEdit(
-                                                            purchase.id,
-                                                        ),
+                                                        createEdit(purchase.id),
                                                     )}
                                                     className="text-primary-700 hover:underline dark:text-primary-400"
                                                     title={

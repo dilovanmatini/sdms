@@ -1,9 +1,7 @@
 import { usePage } from '@inertiajs/react';
 import { LayoutGrid, Ruler, Settings2, UserCog } from 'lucide-react';
 import type { PropsWithChildren } from 'react';
-import {
-    SettingsSubNav,
-} from '@/components/settings-sub-nav';
+import { SettingsSubNav } from '@/components/settings-sub-nav';
 import type { SettingsNavItem } from '@/components/settings-sub-nav';
 import { toUrl } from '@/lib/utils';
 import { index as settingsIndex } from '@/routes/settings';

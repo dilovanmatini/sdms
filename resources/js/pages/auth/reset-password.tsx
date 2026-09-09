@@ -8,7 +8,8 @@ export default function ResetPassword() {
             <Head title="إعادة تعيين كلمة المرور" />
             <div className="space-y-4 text-center">
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                    إعادة تعيين كلمة المرور غير مفعّلة. يرجى التواصل مع مدير النظام.
+                    إعادة تعيين كلمة المرور غير مفعّلة. يرجى التواصل مع مدير
+                    النظام.
                 </p>
                 <TextLink href={login()}>العودة لتسجيل الدخول</TextLink>
             </div>

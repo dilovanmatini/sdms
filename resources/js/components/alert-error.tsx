@@ -10,9 +10,7 @@ export default function AlertError({
 }) {
     return (
         <Alert color="failure" icon={AlertCircle}>
-            <span className="font-medium">
-                {title || 'حدث خطأ ما.'}
-            </span>
+            <span className="font-medium">{title || 'حدث خطأ ما.'}</span>
             <ul className="mt-1.5 list-inside list-disc text-sm">
                 {Array.from(new Set(errors)).map((error, index) => (
                     <li key={index}>{error}</li>

@@ -84,10 +84,14 @@ export default function ReportsShow({
 
     const submit = (event: FormEvent) => {
         event.preventDefault();
-        router.get(reportsShow.url(report.type, { query }), {}, {
-            preserveState: true,
-            replace: true,
-        });
+        router.get(
+            reportsShow.url(report.type, { query }),
+            {},
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
     };
 
     const Icon = icons[report.type] ?? ChartColumn;

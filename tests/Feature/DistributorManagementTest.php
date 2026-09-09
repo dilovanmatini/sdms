@@ -7,10 +7,17 @@ use App\Models\User;
 
 test('administrator can manage distributors', function () {
     $admin = User::factory()->administrator()->create();
+    $distributor = Distributor::factory()->create(['name' => 'موزع القائمة']);
 
     $this->actingAs($admin)
         ->get(route('distributors.index'))
-        ->assertOk();
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('distributors/index')
+            ->has('distributors.data', 1)
+            ->where('distributors.data.0.id', $distributor->id)
+            ->where('distributors.data.0.name', 'موزع القائمة')
+            ->where('distributors.data.0.can_delete', true));
 
     $this->actingAs($admin)
         ->get(route('distributors.create-edit'))
@@ -35,11 +42,11 @@ test('administrator can manage distributors', function () {
 
     $this->assertDatabaseHas('distributors', ['name' => 'موزع الاختبار']);
 
-    $distributor = Distributor::query()->where('name', 'موزع الاختبار')->firstOrFail();
+    $created = Distributor::query()->where('name', 'موزع الاختبار')->firstOrFail();
 
     $this->actingAs($admin)
-        ->from(route('distributors.create-edit', $distributor))
-        ->post(route('distributors.store-update', $distributor), [
+        ->from(route('distributors.create-edit', $created))
+        ->post(route('distributors.store-update', $created), [
             'name' => 'موزع محدث',
             'contact_person' => 'سامي',
             'phone' => '0750000000',
@@ -49,10 +56,10 @@ test('administrator can manage distributors', function () {
             'is_active' => false,
         ])
         ->assertSessionHasNoErrors()
-        ->assertRedirect(route('distributors.create-edit', $distributor));
+        ->assertRedirect(route('distributors.create-edit', $created));
 
     $this->assertDatabaseHas('distributors', [
-        'id' => $distributor->id,
+        'id' => $created->id,
         'name' => 'موزع محدث',
         'is_active' => false,
     ]);

@@ -1,4 +1,11 @@
-import { Badge, Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'flowbite-react';
+import {
+    Badge,
+    Button,
+    Modal,
+    ModalBody,
+    ModalFooter,
+    ModalHeader,
+} from 'flowbite-react';
 import { KeyRound, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import type { Passkey } from '@/types/auth';
@@ -44,12 +51,7 @@ export default function PasskeyItem({ passkey, onDelete }: Props) {
                 </div>
             </div>
 
-            <Button
-                color="red"
-                size="sm"
-                outline
-                onClick={() => setOpen(true)}
-            >
+            <Button color="red" size="sm" outline onClick={() => setOpen(true)}>
                 <Trash2 className="h-4 w-4" />
                 <span className="sr-only">إزالة</span>
             </Button>

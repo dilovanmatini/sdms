@@ -3,21 +3,17 @@ import { Button, Label, Textarea, TextInput } from 'flowbite-react';
 import { Edit, FileText, Printer } from 'lucide-react';
 import type { FormEvent } from 'react';
 import SalesInvoiceController from '@/actions/App/Http/Controllers/SalesInvoiceController';
-import {
-    AsyncSearchableSelect
-    
-} from '@/components/async-searchable-select';
-import type {SearchableSelectOption} from '@/components/async-searchable-select';
+import { AsyncSearchableSelect } from '@/components/async-searchable-select';
+import type { SearchableSelectOption } from '@/components/async-searchable-select';
 import { ConfirmActionButton } from '@/components/confirm-action-button';
 import { DocumentStatusBadge } from '@/components/document-status-badge';
 import { FormActions, FormCard } from '@/components/form-card';
 import InputError from '@/components/input-error';
 import {
     calculateInvoiceSubtotal,
-    SalesInvoiceLinesEditor
-    
+    SalesInvoiceLinesEditor,
 } from '@/components/sales-invoice-lines-editor';
-import type {SalesInvoiceLineDraft} from '@/components/sales-invoice-lines-editor';
+import type { SalesInvoiceLineDraft } from '@/components/sales-invoice-lines-editor';
 import { lookupQuery } from '@/hooks/use-lookup-options';
 import { useCurrency, useFormatMoney } from '@/lib/money';
 import { distributors as distributorLookups } from '@/routes/lookups';
@@ -316,11 +312,7 @@ export default function SalesInvoicesCreateEdit({
                                         إلغاء الفاتورة
                                     </ConfirmActionButton>
                                 )}
-                                <Button
-                                    color="light"
-                                    href={index.url()}
-                                    as="a"
-                                >
+                                <Button color="light" href={index.url()} as="a">
                                     رجوع
                                 </Button>
                             </>

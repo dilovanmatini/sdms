@@ -79,9 +79,7 @@ export default function UnitsCreateEdit({ unit }: Props) {
                                 }
                             >
                                 <Button type="submit" disabled={processing}>
-                                    {unit
-                                        ? 'حفظ التعديلات'
-                                        : 'إنشاء الوحدة'}
+                                    {unit ? 'حفظ التعديلات' : 'إنشاء الوحدة'}
                                 </Button>
                             </FormActions>
                         </>

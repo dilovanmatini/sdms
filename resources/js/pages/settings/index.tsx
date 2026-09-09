@@ -46,12 +46,15 @@ export default function SettingsIndex({ cards }: Props) {
                                 <Link
                                     key={card.href}
                                     href={toUrl(card.href)}
-                                    className="block rounded-lg focus:outline-none focus:ring-0 focus-visible:shadow-focus"
+                                    className="block rounded-lg focus:ring-0 focus:outline-none focus-visible:shadow-focus"
                                 >
                                     <Card className="h-full transition hover:bg-gray-50 dark:hover:bg-gray-800">
                                         <div className="flex items-start gap-3">
                                             <div className="rounded-full bg-primary-50 p-2.5 text-primary-700 dark:bg-gray-700 dark:text-primary-300">
-                                                <Icon className="h-5 w-5" aria-hidden />
+                                                <Icon
+                                                    className="h-5 w-5"
+                                                    aria-hidden
+                                                />
                                             </div>
                                             <div className="space-y-1">
                                                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">

@@ -53,8 +53,8 @@ export default function ManageTwoFactor(props: Props) {
             {twoFactorEnabled ? (
                 <div className="flex flex-col items-start justify-start space-y-4">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                        سيُطلب منك رمز آمن عشوائي عند تسجيل الدخول، يمكنك
-                        الحصول عليه من تطبيق المصادقة المدعوم لـ TOTP على هاتفك.
+                        سيُطلب منك رمز آمن عشوائي عند تسجيل الدخول، يمكنك الحصول
+                        عليه من تطبيق المصادقة المدعوم لـ TOTP على هاتفك.
                     </p>
 
                     <div className="relative inline">
@@ -81,8 +81,8 @@ export default function ManageTwoFactor(props: Props) {
                 <div className="flex flex-col items-start justify-start space-y-4">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                         عند تفعيل المصادقة الثنائية، سيُطلب منك رمز آمن عند
-                        تسجيل الدخول. يمكنك الحصول على هذا الرمز من تطبيق
-                        مصادقة يدعم TOTP على هاتفك.
+                        تسجيل الدخول. يمكنك الحصول على هذا الرمز من تطبيق مصادقة
+                        يدعم TOTP على هاتفك.
                     </p>
 
                     <div>

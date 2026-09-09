@@ -74,8 +74,7 @@ export function NavMain({
                 <SidebarItemGroup key={group.title}>
                     {group.items.map((item) => {
                         const icon = item.icon as
-                            | FC<ComponentProps<'svg'>>
-                            | undefined;
+                            FC<ComponentProps<'svg'>> | undefined;
                         const href = toUrl(item.href);
 
                         return (

@@ -13,11 +13,8 @@ import {
 import { FileDown, Printer, ScrollText, Search } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import {
-    AsyncSearchableSelect
-    
-} from '@/components/async-searchable-select';
-import type {SearchableSelectOption} from '@/components/async-searchable-select';
+import { AsyncSearchableSelect } from '@/components/async-searchable-select';
+import type { SearchableSelectOption } from '@/components/async-searchable-select';
 import { FormCard } from '@/components/form-card';
 import { lookupQuery } from '@/hooks/use-lookup-options';
 import { useFormatMoney } from '@/lib/money';
@@ -151,8 +148,7 @@ export default function StatementsIndex({
                                     distributorLookups.url(
                                         lookupQuery(search, {
                                             active_only: 0,
-                                            include:
-                                                distributorId || undefined,
+                                            include: distributorId || undefined,
                                         }),
                                     )
                                 }
@@ -279,8 +275,7 @@ export default function StatementsIndex({
                                                     colSpan={6}
                                                     className="py-8 text-center text-gray-500"
                                                 >
-                                                    لا توجد حركات في هذه
-                                                    الفترة
+                                                    لا توجد حركات في هذه الفترة
                                                 </TableCell>
                                             </TableRow>
                                         ) : (
@@ -309,9 +304,7 @@ export default function StatementsIndex({
                                                             : '—'}
                                                     </TableCell>
                                                     <TableCell className="text-end font-medium tabular-nums">
-                                                        {
-                                                            entry.running_balance
-                                                        }
+                                                        {entry.running_balance}
                                                     </TableCell>
                                                 </TableRow>
                                             ))

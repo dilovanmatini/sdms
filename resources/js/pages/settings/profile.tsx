@@ -50,7 +50,9 @@ export default function Profile() {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="username">اسم المستخدم</Label>
+                                    <Label htmlFor="username">
+                                        اسم المستخدم
+                                    </Label>
 
                                     <TextInput
                                         id="username"

@@ -117,7 +117,7 @@ export default function Dashboard({ metrics }: Props) {
                                         <p className="text-sm text-gray-500 dark:text-gray-400">
                                             {card.title}
                                         </p>
-                                        <p className="text-2xl font-semibold tabular-nums text-gray-900 dark:text-white">
+                                        <p className="text-2xl font-semibold text-gray-900 tabular-nums dark:text-white">
                                             {card.value}
                                         </p>
                                         <p className="text-xs text-gray-400">
@@ -263,9 +263,7 @@ export default function Dashboard({ metrics }: Props) {
                                                                 )}
                                                                 className="text-primary-700 hover:underline dark:text-primary-400"
                                                             >
-                                                                {
-                                                                    payment.number
-                                                                }
+                                                                {payment.number}
                                                             </Link>
                                                         </TableCell>
                                                         <TableCell className="text-start">

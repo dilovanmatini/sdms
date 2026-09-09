@@ -3,15 +3,15 @@ import { Button, Label, Textarea, TextInput } from 'flowbite-react';
 import { Edit, Package } from 'lucide-react';
 import ProductController from '@/actions/App/Http/Controllers/ProductController';
 import { ActiveStatusToggle } from '@/components/active-status-toggle';
-import {
-    AsyncSearchableSelect
-    
-} from '@/components/async-searchable-select';
-import type {SearchableSelectOption} from '@/components/async-searchable-select';
+import { AsyncSearchableSelect } from '@/components/async-searchable-select';
+import type { SearchableSelectOption } from '@/components/async-searchable-select';
 import { FormActions, FormCard } from '@/components/form-card';
 import InputError from '@/components/input-error';
 import { lookupQuery } from '@/hooks/use-lookup-options';
-import { categories as categoryLookups, units as unitLookups } from '@/routes/lookups';
+import {
+    categories as categoryLookups,
+    units as unitLookups,
+} from '@/routes/lookups';
 import { createEdit, index } from '@/routes/products';
 
 type Props = {
@@ -125,9 +125,7 @@ export default function ProductsCreateEdit({
                                         searchPlaceholder="ابحث عن وحدة..."
                                         defaultValue={product?.unit_id ?? ''}
                                         initialOptions={
-                                            selected_unit
-                                                ? [selected_unit]
-                                                : []
+                                            selected_unit ? [selected_unit] : []
                                         }
                                         buildUrl={(search) =>
                                             unitLookups.url(

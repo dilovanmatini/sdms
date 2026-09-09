@@ -77,8 +77,7 @@ export const flowbiteTheme = createTheme({
         base: `h-4 w-4 appearance-none rounded-full border border-gray-300 bg-gray-100 bg-[length:1em_1em] bg-center bg-no-repeat checked:border-transparent checked:bg-current checked:bg-dot-icon ${fieldFocus} focus:ring-offset-0 dark:border-gray-600 dark:bg-gray-700 dark:checked:border-transparent dark:checked:bg-current`,
     },
     select: {
-        addon:
-            'inline-flex items-center rounded-s-md border border-e-0 border-gray-300 bg-gray-200 px-3 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-400',
+        addon: 'inline-flex items-center rounded-s-md border border-e-0 border-gray-300 bg-gray-200 px-3 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-400',
         field: {
             icon: {
                 base: 'pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3',
@@ -138,8 +137,7 @@ export const flowbiteTheme = createTheme({
         },
     },
     textInput: {
-        addon:
-            'inline-flex items-center rounded-s-md border border-e-0 border-gray-300 bg-gray-200 px-3 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-400',
+        addon: 'inline-flex items-center rounded-s-md border border-e-0 border-gray-300 bg-gray-200 px-3 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-400',
         field: {
             icon: {
                 base: 'pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3',

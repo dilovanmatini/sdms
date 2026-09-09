@@ -13,20 +13,14 @@ import {
 } from 'flowbite-react';
 import { Ban, Pencil, Plus, Wallet } from 'lucide-react';
 import PaymentReceiptController from '@/actions/App/Http/Controllers/PaymentReceiptController';
-import {
-    AsyncSearchableSelect
-    
-} from '@/components/async-searchable-select';
-import type {SearchableSelectOption} from '@/components/async-searchable-select';
+import { AsyncSearchableSelect } from '@/components/async-searchable-select';
+import type { SearchableSelectOption } from '@/components/async-searchable-select';
 import { ConfirmActionButton } from '@/components/confirm-action-button';
 import { DeleteButton } from '@/components/delete-button';
 import { DocumentStatusBadge } from '@/components/document-status-badge';
 import { FormCard } from '@/components/form-card';
-import {
-    PaginationLinks
-    
-} from '@/components/pagination-links';
-import type {Paginated} from '@/components/pagination-links';
+import { PaginationLinks } from '@/components/pagination-links';
+import type { Paginated } from '@/components/pagination-links';
 import { SearchFilter } from '@/components/search-filter';
 import { lookupQuery } from '@/hooks/use-lookup-options';
 import { toUrl } from '@/lib/utils';
@@ -191,8 +185,7 @@ export default function PaymentReceiptsIndex({
                                     distributorLookups.url(
                                         lookupQuery(search, {
                                             active_only: 0,
-                                            include:
-                                                distributorId || undefined,
+                                            include: distributorId || undefined,
                                         }),
                                     )
                                 }

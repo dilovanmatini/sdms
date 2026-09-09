@@ -36,10 +36,7 @@ type Props = {
     currency_options: CurrencyOption[];
 };
 
-export default function GeneralSettings({
-    settings,
-    currency_options,
-}: Props) {
+export default function GeneralSettings({ settings, currency_options }: Props) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(
         settings.logo_url,
     );
@@ -71,7 +68,9 @@ export default function GeneralSettings({
                                 </h3>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="app_name">اسم التطبيق</Label>
+                                    <Label htmlFor="app_name">
+                                        اسم التطبيق
+                                    </Label>
                                     <TextInput
                                         id="app_name"
                                         name="app_name"
@@ -124,7 +123,9 @@ export default function GeneralSettings({
                                                 event.target.files?.[0] ?? null;
 
                                             if (file === null) {
-                                                setPreviewUrl(settings.logo_url);
+                                                setPreviewUrl(
+                                                    settings.logo_url,
+                                                );
 
                                                 return;
                                             }

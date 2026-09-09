@@ -1,10 +1,7 @@
 import { Button, Label, TextInput } from 'flowbite-react';
 import { Plus, Trash2 } from 'lucide-react';
-import {
-    AsyncSearchableSelect
-
-} from '@/components/async-searchable-select';
-import type {SearchableSelectOption} from '@/components/async-searchable-select';
+import { AsyncSearchableSelect } from '@/components/async-searchable-select';
+import type { SearchableSelectOption } from '@/components/async-searchable-select';
 import InputError from '@/components/input-error';
 import { lookupQuery } from '@/hooks/use-lookup-options';
 import { useCurrency, useFormatMoney } from '@/lib/money';
@@ -57,10 +54,7 @@ export function SalesInvoiceLinesEditor({
     };
 
     const addLine = () => {
-        onChange([
-            ...lines,
-            { product_id: '', quantity: '', unit_price: '' },
-        ]);
+        onChange([...lines, { product_id: '', quantity: '', unit_price: '' }]);
     };
 
     const removeLine = (index: number) => {
@@ -76,7 +70,12 @@ export function SalesInvoiceLinesEditor({
             <div className="flex items-center justify-between">
                 <Label>العناصر</Label>
                 {!readOnly && (
-                    <Button type="button" size="xs" color="light" onClick={addLine}>
+                    <Button
+                        type="button"
+                        size="xs"
+                        color="light"
+                        onClick={addLine}
+                    >
                         <Plus className="me-1 h-3.5 w-3.5" />
                         إضافة عنصر
                     </Button>
@@ -210,6 +209,8 @@ export function SalesInvoiceLinesEditor({
     );
 }
 
-export function calculateInvoiceSubtotal(lines: SalesInvoiceLineDraft[]): number {
+export function calculateInvoiceSubtotal(
+    lines: SalesInvoiceLineDraft[],
+): number {
     return lines.reduce((sum, line) => sum + Number(lineTotal(line)), 0);
 }

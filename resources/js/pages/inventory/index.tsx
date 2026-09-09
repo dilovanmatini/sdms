@@ -10,17 +10,11 @@ import {
     TableRow,
 } from 'flowbite-react';
 import { Warehouse } from 'lucide-react';
-import {
-    AsyncSearchableSelect
-    
-} from '@/components/async-searchable-select';
-import type {SearchableSelectOption} from '@/components/async-searchable-select';
+import { AsyncSearchableSelect } from '@/components/async-searchable-select';
+import type { SearchableSelectOption } from '@/components/async-searchable-select';
 import { FormCard } from '@/components/form-card';
-import {
-    PaginationLinks
-    
-} from '@/components/pagination-links';
-import type {Paginated} from '@/components/pagination-links';
+import { PaginationLinks } from '@/components/pagination-links';
+import type { Paginated } from '@/components/pagination-links';
 import { SearchFilter } from '@/components/search-filter';
 import { lookupQuery } from '@/hooks/use-lookup-options';
 import { index } from '@/routes/inventory';
@@ -62,9 +56,7 @@ export default function InventoryIndex({
     filters,
     stock_options,
 }: Props) {
-    const categoryId = filters.category_id
-        ? String(filters.category_id)
-        : '';
+    const categoryId = filters.category_id ? String(filters.category_id) : '';
 
     const applyFilters = (overrides: {
         category_id?: string;
@@ -136,8 +128,7 @@ export default function InventoryIndex({
                                 buildUrl={(search) =>
                                     categoryLookups.url(
                                         lookupQuery(search, {
-                                            include:
-                                                categoryId || undefined,
+                                            include: categoryId || undefined,
                                         }),
                                     )
                                 }
@@ -212,8 +203,7 @@ export default function InventoryIndex({
                                                 {product.name_ar}
                                             </TableCell>
                                             <TableCell className="text-start">
-                                                {product.category?.name ??
-                                                    '—'}
+                                                {product.category?.name ?? '—'}
                                             </TableCell>
                                             <TableCell className="text-start">
                                                 {product.unit

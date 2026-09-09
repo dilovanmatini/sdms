@@ -61,6 +61,5 @@ export default function ConfirmPassword() {
 
 ConfirmPassword.layout = {
     title: 'تأكيد كلمة المرور',
-    description:
-        'هذه منطقة آمنة من التطبيق. يرجى تأكيد كلمة المرور للمتابعة.',
+    description: 'هذه منطقة آمنة من التطبيق. يرجى تأكيد كلمة المرور للمتابعة.',
 };

@@ -22,7 +22,11 @@ export default function CategoriesCreateEdit({ category }: Props) {
             <Head title={category ? 'تعديل صنف' : 'إضافة صنف'} />
             <FormCard
                 title={category ? 'تعديل صنف' : 'إضافة صنف'}
-                description={category ? category.name : 'إنشاء صنف منتج جديد وتنظيم المنتجات ضمن مجموعة واضحة'}
+                description={
+                    category
+                        ? category.name
+                        : 'إنشاء صنف منتج جديد وتنظيم المنتجات ضمن مجموعة واضحة'
+                }
                 icon={category ? Edit : Tags}
             >
                 <Form

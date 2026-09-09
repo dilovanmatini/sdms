@@ -113,7 +113,9 @@ export function PaginationLinks({ meta, storageKey }: Props) {
     const onPerPageChange = (event: ChangeEvent<HTMLSelectElement>) => {
         const perPage = Number(event.target.value) as DatagridPerPageOption;
 
-        if (!(DATAGRID_PER_PAGE_OPTIONS as readonly number[]).includes(perPage)) {
+        if (
+            !(DATAGRID_PER_PAGE_OPTIONS as readonly number[]).includes(perPage)
+        ) {
             return;
         }
 
@@ -135,7 +137,7 @@ export function PaginationLinks({ meta, storageKey }: Props) {
     return (
         <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
             <div className="flex flex-col items-center gap-3 sm:flex-row">
-            <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2">
                     <Select
                         id={`per-page-${storageKey}`}
                         sizing="sm"

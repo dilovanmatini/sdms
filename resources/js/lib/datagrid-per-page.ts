@@ -32,10 +32,7 @@ const readPreferences = (): Record<string, number> => {
         }
 
         return Object.fromEntries(
-            Object.entries(decoded).map(([key, value]) => [
-                key,
-                Number(value),
-            ]),
+            Object.entries(decoded).map(([key, value]) => [key, Number(value)]),
         );
     } catch {
         return {};
@@ -48,7 +45,9 @@ const readCookie = (name: string): string | null => {
     }
 
     const match = document.cookie.match(
-        new RegExp(`(?:^|; )${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}=([^;]*)`),
+        new RegExp(
+            `(?:^|; )${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}=([^;]*)`,
+        ),
     );
 
     return match ? decodeURIComponent(match[1]) : null;
@@ -63,7 +62,9 @@ const writeCookie = (name: string, value: string, days = 365): void => {
     document.cookie = `${name}=${encodeURIComponent(value)};path=/;max-age=${maxAge};SameSite=Lax`;
 };
 
-export function getStoredDatagridPerPage(grid: string): DatagridPerPageOption | null {
+export function getStoredDatagridPerPage(
+    grid: string,
+): DatagridPerPageOption | null {
     const value = readPreferences()[grid];
 
     if (typeof value !== 'number' || !isAllowedPerPage(value)) {

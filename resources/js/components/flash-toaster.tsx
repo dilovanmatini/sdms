@@ -17,7 +17,8 @@ const icons = {
 } as const;
 
 const iconStyles = {
-    success: 'bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200',
+    success:
+        'bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200',
     info: 'bg-blue-100 text-blue-500 dark:bg-blue-800 dark:text-blue-200',
     warning:
         'bg-yellow-100 text-yellow-500 dark:bg-yellow-800 dark:text-yellow-200',
@@ -63,9 +64,7 @@ export function FlashToaster() {
         );
 
         window.setTimeout(() => {
-            setToasts((current) =>
-                current.filter((toast) => toast.id !== id),
-            );
+            setToasts((current) => current.filter((toast) => toast.id !== id));
         }, TOAST_TRANSITION_MS);
     }
 
@@ -74,7 +73,7 @@ export function FlashToaster() {
     }
 
     return (
-        <div className="fixed bottom-4 end-4 z-50 flex flex-col gap-3">
+        <div className="fixed end-4 bottom-4 z-50 flex flex-col gap-3">
             {toasts.map((toast) => {
                 const Icon = icons[toast.type];
 

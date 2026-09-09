@@ -13,20 +13,14 @@ import {
 } from 'flowbite-react';
 import { Ban, FileText, Pencil, Plus } from 'lucide-react';
 import SalesInvoiceController from '@/actions/App/Http/Controllers/SalesInvoiceController';
-import {
-    AsyncSearchableSelect
-    
-} from '@/components/async-searchable-select';
-import type {SearchableSelectOption} from '@/components/async-searchable-select';
+import { AsyncSearchableSelect } from '@/components/async-searchable-select';
+import type { SearchableSelectOption } from '@/components/async-searchable-select';
 import { ConfirmActionButton } from '@/components/confirm-action-button';
 import { DeleteButton } from '@/components/delete-button';
 import { DocumentStatusBadge } from '@/components/document-status-badge';
 import { FormCard } from '@/components/form-card';
-import {
-    PaginationLinks
-    
-} from '@/components/pagination-links';
-import type {Paginated} from '@/components/pagination-links';
+import { PaginationLinks } from '@/components/pagination-links';
+import type { Paginated } from '@/components/pagination-links';
 import { SearchFilter } from '@/components/search-filter';
 import { lookupQuery } from '@/hooks/use-lookup-options';
 import { toUrl } from '@/lib/utils';
@@ -182,8 +176,7 @@ export default function SalesInvoicesIndex({
                                     distributorLookups.url(
                                         lookupQuery(search, {
                                             active_only: 0,
-                                            include:
-                                                distributorId || undefined,
+                                            include: distributorId || undefined,
                                         }),
                                     )
                                 }
@@ -293,9 +286,7 @@ export default function SalesInvoicesIndex({
                                             <TableCell className="text-start font-medium">
                                                 <Link
                                                     href={toUrl(
-                                                        createEdit(
-                                                            invoice.id,
-                                                        ),
+                                                        createEdit(invoice.id),
                                                     )}
                                                     className="text-primary-700 hover:underline dark:text-primary-400"
                                                     title={

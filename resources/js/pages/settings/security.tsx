@@ -68,11 +68,15 @@ export default function Security(props: Props) {
                                         placeholder="كلمة المرور الحالية"
                                     />
 
-                                    <InputError message={errors.current_password} />
+                                    <InputError
+                                        message={errors.current_password}
+                                    />
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="password">كلمة المرور الجديدة</Label>
+                                    <Label htmlFor="password">
+                                        كلمة المرور الجديدة
+                                    </Label>
 
                                     <PasswordInput
                                         id="password"

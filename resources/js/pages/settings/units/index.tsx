@@ -15,11 +15,8 @@ import { ActiveStatusFilter } from '@/components/active-status-filter';
 import type { ActiveStatusOption } from '@/components/active-status-filter';
 import { DeleteButton } from '@/components/delete-button';
 import { FormCard } from '@/components/form-card';
-import {
-    PaginationLinks
-    
-} from '@/components/pagination-links';
-import type {Paginated} from '@/components/pagination-links';
+import { PaginationLinks } from '@/components/pagination-links';
+import type { Paginated } from '@/components/pagination-links';
 import { SearchFilter } from '@/components/search-filter';
 import { toUrl } from '@/lib/utils';
 import { createEdit, index } from '@/routes/units';

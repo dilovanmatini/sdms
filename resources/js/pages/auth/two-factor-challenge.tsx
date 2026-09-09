@@ -25,8 +25,7 @@ export default function TwoFactorChallenge() {
 
         return {
             title: 'رمز المصادقة',
-            description:
-                'أدخل رمز المصادقة من تطبيق المصادقة لديك.',
+            description: 'أدخل رمز المصادقة من تطبيق المصادقة لديك.',
             toggleText: 'تسجيل الدخول باستخدام رمز الاسترداد',
         };
     }, [showRecoveryInput]);
