@@ -18,6 +18,7 @@ test('administrator can view general settings', function () {
             ->has('settings.app_name')
             ->where('settings.currency', 'usd')
             ->where('settings.logo_url', null)
+            ->where('settings.show_dashboard_numbers', true)
             ->has('currency_options', 2));
 });
 
@@ -41,6 +42,7 @@ test('administrator can update general settings', function () {
             'invoice_footer' => 'تذييل الفاتورة',
             'receipt_header' => 'رأس السند',
             'receipt_footer' => 'تذييل السند',
+            'show_dashboard_numbers' => false,
         ]);
 
     $response
@@ -54,7 +56,8 @@ test('administrator can update general settings', function () {
         ->and($settings->invoice_header)->toBe('رأس الفاتورة')
         ->and($settings->invoice_footer)->toBe('تذييل الفاتورة')
         ->and($settings->receipt_header)->toBe('رأس السند')
-        ->and($settings->receipt_footer)->toBe('تذييل السند');
+        ->and($settings->receipt_footer)->toBe('تذييل السند')
+        ->and($settings->show_dashboard_numbers)->toBeFalse();
 });
 
 test('administrator can upload and remove a logo', function () {
@@ -67,6 +70,7 @@ test('administrator can upload and remove a logo', function () {
             'app_name' => 'SDMS',
             'currency' => 'usd',
             'logo' => UploadedFile::fake()->image('logo.png'),
+            'show_dashboard_numbers' => true,
         ])
         ->assertSessionHasNoErrors()
         ->assertRedirect(route('settings.general.edit'));
@@ -83,6 +87,7 @@ test('administrator can upload and remove a logo', function () {
             'app_name' => 'SDMS',
             'currency' => 'usd',
             'remove_logo' => true,
+            'show_dashboard_numbers' => true,
         ])
         ->assertSessionHasNoErrors()
         ->assertRedirect(route('settings.general.edit'));
@@ -101,6 +106,7 @@ test('general settings require an app name', function () {
         ->put(route('settings.general.update'), [
             'app_name' => '',
             'currency' => 'usd',
+            'show_dashboard_numbers' => true,
         ])
         ->assertSessionHasErrors('app_name')
         ->assertRedirect(route('settings.general.edit'));
@@ -114,6 +120,7 @@ test('general settings reject an invalid currency', function () {
         ->put(route('settings.general.update'), [
             'app_name' => 'SDMS',
             'currency' => 'eur',
+            'show_dashboard_numbers' => true,
         ])
         ->assertSessionHasErrors('currency')
         ->assertRedirect(route('settings.general.edit'));
@@ -153,6 +160,7 @@ test('config app name follows system settings', function () {
             'invoice_footer' => null,
             'receipt_header' => null,
             'receipt_footer' => null,
+            'show_dashboard_numbers' => true,
         ])
         ->assertSessionHasNoErrors();
 
@@ -163,5 +171,6 @@ test('config app name follows system settings', function () {
 test('system settings default currency is usd', function () {
     $settings = SystemSetting::current();
 
-    expect($settings->currency)->toBe(Currency::Usd);
+    expect($settings->currency)->toBe(Currency::Usd)
+        ->and($settings->show_dashboard_numbers)->toBeTrue();
 });

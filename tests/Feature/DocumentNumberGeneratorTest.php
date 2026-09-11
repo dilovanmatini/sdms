@@ -9,5 +9,6 @@ test('document number generator produces sequential unique numbers', function ()
     expect($generator->generate(DocumentType::Purchase))->toBe('PUR-000001')
         ->and($generator->generate(DocumentType::Purchase))->toBe('PUR-000002')
         ->and($generator->generate(DocumentType::Invoice))->toBe('INV-000001')
-        ->and($generator->generate(DocumentType::Receipt))->toBe('REC-000001');
+        ->and($generator->generate(DocumentType::Receipt))->toBe('REC-000001')
+        ->and($generator->generate(DocumentType::OpeningBalance))->toBe('OPB-000001');
 });

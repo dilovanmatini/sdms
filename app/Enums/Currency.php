@@ -22,4 +22,12 @@ enum Currency: string
             self::Iqd => 'د.ع',
         };
     }
+
+    public function isoCode(): string
+    {
+        return match ($this) {
+            self::Usd => 'USD',
+            self::Iqd => 'IQD',
+        };
+    }
 }

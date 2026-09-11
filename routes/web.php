@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DistributorController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LookupController;
+use App\Http\Controllers\OpeningBalanceController;
 use App\Http\Controllers\PaymentReceiptController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
@@ -16,12 +17,13 @@ use App\Http\Controllers\SalesInvoiceController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
 
-Route::inertia('/', 'welcome')->name('home');
-
 Route::get('manifest.json', PwaManifestController::class)->name('pwa.manifest');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('dashboard', DashboardController::class)->name('dashboard');
+    Route::redirect('/', '/dashboard')->name('home');
+    Route::get('dashboard', [DashboardController::class, 'show'])->name('dashboard');
+    Route::patch('dashboard/numbers-visibility', [DashboardController::class, 'updateNumbersVisibility'])
+        ->name('dashboard.numbers-visibility');
 
     Route::group(['prefix' => 'lookups', 'as' => 'lookups.'], function () {
         Route::get('products', [LookupController::class, 'products'])->name('products');
@@ -71,6 +73,17 @@ Route::middleware(['auth'])->group(function () {
         Route::get('create-edit/{purchase?}', [PurchaseController::class, 'createEdit'])->name('purchases.create-edit');
         Route::post('{purchase?}', [PurchaseController::class, 'storeUpdate'])->name('purchases.store-update');
         Route::delete('{purchase}', [PurchaseController::class, 'destroy'])->name('purchases.destroy');
+    });
+
+    Route::post('opening-balances/{opening_balance}/post', [OpeningBalanceController::class, 'post'])
+        ->name('opening-balances.post');
+    Route::post('opening-balances/{opening_balance}/cancel', [OpeningBalanceController::class, 'cancel'])
+        ->name('opening-balances.cancel');
+    Route::group(['prefix' => 'opening-balances'], function () {
+        Route::get('/', [OpeningBalanceController::class, 'index'])->name('opening-balances.index');
+        Route::get('create-edit/{opening_balance?}', [OpeningBalanceController::class, 'createEdit'])->name('opening-balances.create-edit');
+        Route::post('{opening_balance?}', [OpeningBalanceController::class, 'storeUpdate'])->name('opening-balances.store-update');
+        Route::delete('{opening_balance}', [OpeningBalanceController::class, 'destroy'])->name('opening-balances.destroy');
     });
 
     Route::post('sales-invoices/{sales_invoice}/post', [SalesInvoiceController::class, 'post'])

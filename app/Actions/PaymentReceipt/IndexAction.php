@@ -27,7 +27,6 @@ class IndexAction
 
         $receipts = PaymentReceipt::query()
             ->with(['distributor:id,name'])
-            ->withSum('allocations as total_amount', 'amount')
             ->when($filters['search'] !== '', function (Builder $query) use ($filters): void {
                 $search = $filters['search'];
                 $query->where(function (Builder $query) use ($search): void {
@@ -68,7 +67,7 @@ class IndexAction
                 'distributor' => $receipt->distributor?->only(['id', 'name']),
                 'payment_method' => $receipt->payment_method->value,
                 'payment_method_label' => $receipt->payment_method->label(),
-                'total_amount' => MoneyDisplay::format($receipt->total_amount ?? 0),
+                'total_amount' => MoneyDisplay::format($receipt->amount ?? 0),
                 'status' => $receipt->status->value,
                 'status_label' => $receipt->status->label(),
                 'is_posted' => $receipt->isPosted(),

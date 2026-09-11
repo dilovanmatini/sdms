@@ -68,7 +68,6 @@ class DashboardMetrics
 
         $recentPayments = PaymentReceipt::query()
             ->with('distributor:id,name')
-            ->withSum('allocations as total_amount', 'amount')
             ->where('status', DocumentStatus::Posted)
             ->latest('receipt_date')
             ->latest('id')
@@ -79,7 +78,7 @@ class DashboardMetrics
                 'number' => $receipt->number,
                 'receipt_date' => $receipt->receipt_date?->toDateString(),
                 'distributor' => $receipt->distributor?->name,
-                'total_amount' => MoneyDisplay::format($receipt->total_amount ?? 0, trim: true),
+                'total_amount' => MoneyDisplay::format($receipt->amount ?? 0, trim: true),
             ])
             ->all();
 

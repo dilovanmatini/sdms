@@ -22,6 +22,7 @@ class EditAction
                 'invoice_footer' => $settings->invoice_footer,
                 'receipt_header' => $settings->receipt_header,
                 'receipt_footer' => $settings->receipt_footer,
+                'show_dashboard_numbers' => $settings->show_dashboard_numbers,
             ],
             'currency_options' => collect(Currency::cases())
                 ->map(fn (Currency $currency): array => [

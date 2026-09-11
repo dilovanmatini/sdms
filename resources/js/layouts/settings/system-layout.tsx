@@ -1,10 +1,17 @@
 import { usePage } from '@inertiajs/react';
-import { LayoutGrid, Ruler, Settings2, UserCog } from 'lucide-react';
+import {
+    DatabaseBackup,
+    LayoutGrid,
+    Ruler,
+    Settings2,
+    UserCog,
+} from 'lucide-react';
 import type { PropsWithChildren } from 'react';
 import { SettingsSubNav } from '@/components/settings-sub-nav';
 import type { SettingsNavItem } from '@/components/settings-sub-nav';
 import { toUrl } from '@/lib/utils';
 import { index as settingsIndex } from '@/routes/settings';
+import { index as backupsIndex } from '@/routes/settings/backups';
 import { edit as generalSettingsEdit } from '@/routes/settings/general';
 import { index as unitsIndex } from '@/routes/units';
 import { index as usersIndex } from '@/routes/users';
@@ -20,6 +27,12 @@ const sidebarNavItems: SettingsNavItem[] = [
         title: 'عام',
         href: generalSettingsEdit(),
         icon: Settings2,
+        ability: 'manage_settings',
+    },
+    {
+        title: 'النسخ الاحتياطي',
+        href: backupsIndex(),
+        icon: DatabaseBackup,
         ability: 'manage_settings',
     },
     {

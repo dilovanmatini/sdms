@@ -15,7 +15,13 @@ test('warehouse role can manage purchases but not receipts', function () {
 
 test('sales role can manage invoices but not purchases', function () {
     expect(RoleAbility::allows(UserRole::Sales, Ability::ManageSales))->toBeTrue()
+        ->and(RoleAbility::allows(UserRole::Sales, Ability::ManageOpeningBalances))->toBeTrue()
         ->and(RoleAbility::allows(UserRole::Sales, Ability::ManagePurchases))->toBeFalse();
+});
+
+test('accountant can manage opening balances but warehouse cannot', function () {
+    expect(RoleAbility::allows(UserRole::Accountant, Ability::ManageOpeningBalances))->toBeTrue()
+        ->and(RoleAbility::allows(UserRole::Warehouse, Ability::ManageOpeningBalances))->toBeFalse();
 });
 
 test('manager can manage units but warehouse cannot', function () {

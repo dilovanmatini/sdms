@@ -6,10 +6,11 @@ use App\Enums\DocumentStatus;
 use App\Enums\LedgerReferenceType;
 use App\Models\AccountsReceivableEntry;
 use App\Models\CustomerLedgerEntry;
+use App\Models\OpeningBalance;
 use App\Models\PaymentReceipt;
 use App\Models\SalesInvoice;
 use App\Models\User;
-use App\Support\MoneyDisplay;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -22,51 +23,19 @@ class PaymentReceiptPoster
             $locked = PaymentReceipt::query()
                 ->whereKey($receipt->id)
                 ->lockForUpdate()
-                ->with(['allocations.salesInvoice'])
                 ->firstOrFail();
 
             if (! $locked->isDraft()) {
                 throw new InvalidArgumentException('لا يمكن ترحيل إلا سند القبض المسودة.');
             }
 
-            if ($locked->allocations->isEmpty()) {
-                throw new InvalidArgumentException('لا يمكن ترحيل سند قبض بدون توزيعات.');
-            }
-
-            $invoiceIds = $locked->allocations->pluck('sales_invoice_id')->all();
-
-            SalesInvoice::query()
-                ->whereIn('id', $invoiceIds)
-                ->lockForUpdate()
-                ->get();
-
-            $totalAmount = '0';
-
-            foreach ($locked->allocations as $allocation) {
-                $invoice = $allocation->salesInvoice;
-
-                if ($invoice === null || ! $invoice->isPosted()) {
-                    throw new InvalidArgumentException('يمكن التوزيع فقط على فواتير مبيعات نشطة.');
-                }
-
-                if ((int) $invoice->distributor_id !== (int) $locked->distributor_id) {
-                    throw new InvalidArgumentException('الفاتورة لا تتبع نفس الموزع.');
-                }
-
-                $remaining = $invoice->remainingAmount();
-
-                if (bccomp((string) $allocation->amount, $remaining, 2) === 1) {
-                    throw new InvalidArgumentException(
-                        'مبلغ التوزيع يتجاوز المتبقي للفاتورة '.$invoice->number.'. المتبقي: '.MoneyDisplay::withSymbol($remaining),
-                    );
-                }
-
-                $totalAmount = bcadd($totalAmount, (string) $allocation->amount, 2);
-            }
+            $totalAmount = number_format((float) $locked->amount, 2, '.', '');
 
             if (bccomp($totalAmount, '0', 2) !== 1) {
                 throw new InvalidArgumentException('إجمالي سند القبض يجب أن يكون أكبر من صفر.');
             }
+
+            $this->allocateToOldestReceivables($locked, $totalAmount);
 
             CustomerLedgerEntry::query()->create([
                 'distributor_id' => $locked->distributor_id,
@@ -92,7 +61,85 @@ class PaymentReceiptPoster
                 'posted_by' => $user->id,
             ]);
 
-            return $locked->refresh()->load(['distributor', 'allocations.salesInvoice', 'poster']);
+            return $locked->refresh()->load(['distributor', 'allocations.salesInvoice', 'allocations.openingBalance', 'poster']);
         });
+    }
+
+    private function allocateToOldestReceivables(PaymentReceipt $receipt, string $totalAmount): void
+    {
+        $receipt->allocations()->delete();
+
+        $remainingToApply = $totalAmount;
+
+        $invoices = SalesInvoice::query()
+            ->where('distributor_id', $receipt->distributor_id)
+            ->where('status', DocumentStatus::Posted)
+            ->orderBy('invoice_date')
+            ->orderBy('id')
+            ->lockForUpdate()
+            ->get();
+
+        $openingBalances = OpeningBalance::query()
+            ->where('distributor_id', $receipt->distributor_id)
+            ->where('status', DocumentStatus::Posted)
+            ->orderBy('entry_date')
+            ->orderBy('id')
+            ->lockForUpdate()
+            ->get();
+
+        /** @var Collection<int, array{date: string, sort: int, type: string, remaining: string, invoice_id: int|null, opening_balance_id: int|null}> $receivables */
+        $receivables = $invoices
+            ->map(fn (SalesInvoice $invoice): array => [
+                'date' => $invoice->invoice_date?->toDateString() ?? '',
+                'sort' => $invoice->id,
+                'type' => 'invoice',
+                'remaining' => $invoice->remainingAmount(),
+                'invoice_id' => $invoice->id,
+                'opening_balance_id' => null,
+            ])
+            ->concat($openingBalances->map(fn (OpeningBalance $openingBalance): array => [
+                'date' => $openingBalance->entry_date?->toDateString() ?? '',
+                'sort' => $openingBalance->id,
+                'type' => 'opening_balance',
+                'remaining' => $openingBalance->remainingAmount(),
+                'invoice_id' => null,
+                'opening_balance_id' => $openingBalance->id,
+            ]))
+            ->sort(function (array $left, array $right): int {
+                $dateComparison = strcmp($left['date'], $right['date']);
+
+                if ($dateComparison !== 0) {
+                    return $dateComparison;
+                }
+
+                if ($left['type'] !== $right['type']) {
+                    return $left['type'] === 'opening_balance' ? -1 : 1;
+                }
+
+                return $left['sort'] <=> $right['sort'];
+            })
+            ->values();
+
+        foreach ($receivables as $receivable) {
+            if (bccomp($remainingToApply, '0', 2) !== 1) {
+                break;
+            }
+
+            if (bccomp($receivable['remaining'], '0', 2) !== 1) {
+                continue;
+            }
+
+            $applied = bccomp($remainingToApply, $receivable['remaining'], 2) === 1
+                ? $receivable['remaining']
+                : $remainingToApply;
+
+            $receipt->allocations()->create([
+                'sales_invoice_id' => $receivable['invoice_id'],
+                'opening_balance_id' => $receivable['opening_balance_id'],
+                'amount' => $applied,
+            ]);
+
+            $remainingToApply = bcsub($remainingToApply, $applied, 2);
+        }
     }
 }

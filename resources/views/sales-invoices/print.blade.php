@@ -279,6 +279,19 @@
             line-height: 1.7;
         }
 
+        .amount-words {
+            margin-top: -12px;
+            margin-bottom: 28px;
+            padding: 10px 12px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            line-height: 1.7;
+        }
+
+        .amount-words strong {
+            margin-inline-end: 6px;
+        }
+
         @media print {
             .actions {
                 display: none;
@@ -385,6 +398,11 @@
                 <td class="value">{{ $invoice['grand_total'] }}</td>
             </tr>
         </table>
+    </div>
+
+    <div class="amount-words">
+        <strong>المبلغ كتابةً:</strong>
+        {{ $invoice['grand_total_in_words'] }}
     </div>
 
     @if ($invoice['notes'])

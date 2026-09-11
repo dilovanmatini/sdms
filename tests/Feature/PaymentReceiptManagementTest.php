@@ -8,7 +8,6 @@ use App\Models\AccountsReceivableEntry;
 use App\Models\CustomerLedgerEntry;
 use App\Models\Distributor;
 use App\Models\PaymentReceipt;
-use App\Models\PaymentReceiptAllocation;
 use App\Models\SalesInvoice;
 use App\Models\SystemSetting;
 use App\Models\User;
@@ -23,6 +22,8 @@ test('payment receipt form lists digital wallets after cash', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('payment-receipts/create-edit')
+            ->missing('selected_invoices')
+            ->where('receipt', null)
             ->where('payment_methods', [
                 ['value' => 'cash', 'label' => 'نقداً'],
                 ['value' => 'fib', 'label' => 'FIB'],
@@ -34,28 +35,17 @@ test('payment receipt form lists digital wallets after cash', function () {
             ]));
 });
 
-test('administrator can create a draft payment receipt with allocations', function () {
+test('administrator can create a draft payment receipt with an amount', function () {
     $admin = User::factory()->administrator()->create();
     $distributor = Distributor::factory()->create(['is_active' => true]);
-    $invoice = SalesInvoice::factory()->posted($admin)->create([
-        'distributor_id' => $distributor->id,
-        'grand_total' => 500,
-        'subtotal' => 500,
-        'discount' => 0,
-    ]);
 
     $this->actingAs($admin)
         ->post(route('payment-receipts.store-update'), [
             'receipt_date' => '2026-08-07',
             'distributor_id' => $distributor->id,
             'payment_method' => PaymentMethod::Cash->value,
+            'amount' => 150,
             'notes' => 'دفعة جزئية',
-            'allocations' => [
-                [
-                    'sales_invoice_id' => $invoice->id,
-                    'amount' => 150,
-                ],
-            ],
         ])
         ->assertRedirect(route('payment-receipts.create-edit', PaymentReceipt::query()->first()));
 
@@ -64,8 +54,8 @@ test('administrator can create a draft payment receipt with allocations', functi
     expect($receipt)->not->toBeNull()
         ->and($receipt->number)->toStartWith('REC-')
         ->and($receipt->status)->toBe(DocumentStatus::Draft)
-        ->and($receipt->allocations)->toHaveCount(1)
-        ->and((string) $receipt->allocations->first()->amount)->toBe('150.00');
+        ->and((string) $receipt->amount)->toBe('150.00')
+        ->and($receipt->allocations)->toHaveCount(0);
 });
 
 test('posting a payment receipt creates ledger credits and reduces balance', function () {
@@ -98,11 +88,6 @@ test('posting a payment receipt creates ledger credits and reduces balance', fun
         'distributor_id' => $distributor->id,
         'payment_method' => PaymentMethod::BankTransfer,
         'status' => DocumentStatus::Draft,
-    ]);
-
-    PaymentReceiptAllocation::factory()->create([
-        'payment_receipt_id' => $receipt->id,
-        'sales_invoice_id' => $invoice->id,
         'amount' => 75,
     ]);
 
@@ -163,11 +148,6 @@ test('cancelling a posted payment receipt reverses ledger entries and restores b
     $receipt = PaymentReceipt::factory()->create([
         'distributor_id' => $distributor->id,
         'status' => DocumentStatus::Draft,
-    ]);
-
-    PaymentReceiptAllocation::factory()->create([
-        'payment_receipt_id' => $receipt->id,
-        'sales_invoice_id' => $invoice->id,
         'amount' => 75,
     ]);
 
@@ -245,15 +225,9 @@ test('draft payment receipt cannot be cancelled and cancelled receipt cannot be 
         ->assertForbidden();
 });
 
-test('cannot allocate more than invoice remaining balance', function () {
+test('draft payment receipt requires a positive amount', function () {
     $admin = User::factory()->administrator()->create();
     $distributor = Distributor::factory()->create(['is_active' => true]);
-    $invoice = SalesInvoice::factory()->posted($admin)->create([
-        'distributor_id' => $distributor->id,
-        'grand_total' => 100,
-        'subtotal' => 100,
-        'discount' => 0,
-    ]);
 
     $this->actingAs($admin)
         ->post(route('payment-receipts.store-update'), [
@@ -261,30 +235,27 @@ test('cannot allocate more than invoice remaining balance', function () {
             'distributor_id' => $distributor->id,
             'payment_method' => PaymentMethod::Cash->value,
             'notes' => null,
-            'allocations' => [
-                [
-                    'sales_invoice_id' => $invoice->id,
-                    'amount' => 150,
-                ],
-            ],
+            'amount' => 0,
         ])
-        ->assertSessionHasErrors('allocations.0.amount');
+        ->assertSessionHasErrors('amount');
 
     expect(PaymentReceipt::query()->count())->toBe(0);
 });
 
-test('one receipt can allocate across multiple invoices', function () {
+test('posting a receipt applies the amount to the oldest open invoices', function () {
     $admin = User::factory()->administrator()->create();
     $distributor = Distributor::factory()->create(['is_active' => true]);
 
     $first = SalesInvoice::factory()->posted($admin)->create([
         'distributor_id' => $distributor->id,
+        'invoice_date' => '2026-08-01',
         'grand_total' => 100,
         'subtotal' => 100,
         'discount' => 0,
     ]);
     $second = SalesInvoice::factory()->posted($admin)->create([
         'distributor_id' => $distributor->id,
+        'invoice_date' => '2026-08-02',
         'grand_total' => 80,
         'subtotal' => 80,
         'discount' => 0,
@@ -308,38 +279,23 @@ test('one receipt can allocate across multiple invoices', function () {
     $receipt = PaymentReceipt::factory()->create([
         'distributor_id' => $distributor->id,
         'status' => DocumentStatus::Draft,
-    ]);
-
-    PaymentReceiptAllocation::factory()->create([
-        'payment_receipt_id' => $receipt->id,
-        'sales_invoice_id' => $first->id,
-        'amount' => 40,
-    ]);
-    PaymentReceiptAllocation::factory()->create([
-        'payment_receipt_id' => $receipt->id,
-        'sales_invoice_id' => $second->id,
-        'amount' => 80,
+        'amount' => 120,
     ]);
 
     $this->actingAs($admin)
         ->post(route('payment-receipts.post', $receipt))
         ->assertRedirect(route('payment-receipts.index'));
 
-    expect($first->remainingAmount())->toBe('60.00')
-        ->and($second->remainingAmount())->toBe('0.00')
-        ->and($distributor->balance())->toBe('60');
+    expect($first->remainingAmount())->toBe('0.00')
+        ->and($second->remainingAmount())->toBe('60.00')
+        ->and($distributor->balance())->toBe('60')
+        ->and($receipt->allocations)->toHaveCount(2);
 });
 
 test('posted payment receipt cannot be updated or deleted', function () {
     $admin = User::factory()->administrator()->create();
-    $receipt = PaymentReceipt::factory()->posted($admin)->withAllocations(1)->create();
+    $receipt = PaymentReceipt::factory()->posted($admin)->create(['amount' => 50]);
     $distributor = Distributor::factory()->create(['is_active' => true]);
-    $invoice = SalesInvoice::factory()->posted($admin)->create([
-        'distributor_id' => $distributor->id,
-        'grand_total' => 50,
-        'subtotal' => 50,
-        'discount' => 0,
-    ]);
 
     $this->actingAs($admin)
         ->post(route('payment-receipts.store-update', $receipt), [
@@ -347,12 +303,7 @@ test('posted payment receipt cannot be updated or deleted', function () {
             'distributor_id' => $distributor->id,
             'payment_method' => PaymentMethod::Cash->value,
             'notes' => 'محاولة تعديل',
-            'allocations' => [
-                [
-                    'sales_invoice_id' => $invoice->id,
-                    'amount' => 10,
-                ],
-            ],
+            'amount' => 10,
         ])
         ->assertForbidden();
 
@@ -453,15 +404,31 @@ test('payment receipts index can filter by distributor, payment method, status, 
 
 test('posted payment receipt can be printed and draft cannot', function () {
     $admin = User::factory()->administrator()->create();
-    $invoice = SalesInvoice::factory()->posted($admin)->create(['number' => 'INV-000099']);
+    $distributor = Distributor::factory()->create();
+
+    CustomerLedgerEntry::factory()->create([
+        'distributor_id' => $distributor->id,
+        'entry_date' => '2026-08-01',
+        'reference_type' => LedgerReferenceType::Invoice,
+        'reference_id' => 1,
+        'debit' => 200,
+        'credit' => 0,
+    ]);
 
     $posted = PaymentReceipt::factory()->posted($admin)->create([
+        'distributor_id' => $distributor->id,
         'payment_method' => PaymentMethod::Cash,
-    ]);
-    PaymentReceiptAllocation::factory()->create([
-        'payment_receipt_id' => $posted->id,
-        'sales_invoice_id' => $invoice->id,
         'amount' => 75,
+        'receipt_date' => '2026-08-07',
+    ]);
+
+    CustomerLedgerEntry::factory()->create([
+        'distributor_id' => $distributor->id,
+        'entry_date' => '2026-08-07',
+        'reference_type' => LedgerReferenceType::Receipt,
+        'reference_id' => $posted->id,
+        'debit' => 0,
+        'credit' => 75,
     ]);
 
     $draft = PaymentReceipt::factory()->create();
@@ -474,7 +441,11 @@ test('posted payment receipt can be printed and draft cannot', function () {
             ->component('payment-receipts/create-edit')
             ->where('can_print', true)
             ->where('can_cancel', true)
-            ->where('can_edit', false));
+            ->where('can_edit', false)
+            ->where('receipt.amount', '75')
+            ->where('receipt.balance_before', '200 $')
+            ->where('receipt.balance_after', '125 $')
+            ->missing('selected_invoices'));
 
     $this->actingAs($admin)
         ->get(route('payment-receipts.print', $posted))
@@ -483,12 +454,17 @@ test('posted payment receipt can be printed and draft cannot', function () {
         ->assertSee('سند قبض', false)
         ->assertSee('إجمالي السند', false)
         ->assertSee('من', false)
-        ->assertSee('رقم الفاتورة', false)
-        ->assertSee('الإجمالي', false)
-        ->assertSee('INV-000099', false)
-        ->assertSee('>75 $</td>', false)
+        ->assertSee('المبلغ السابق', false)
+        ->assertSee('مبلغ السند', false)
+        ->assertSee('المبلغ المتبقي', false)
+        ->assertDontSee('رقم الفاتورة', false)
+        ->assertSee('200 $', false)
+        ->assertSee('75 $', false)
+        ->assertSee('125 $', false)
         ->assertDontSee('75.00', false)
-        ->assertSee('/images/sdsm-logo.png', false)
+        ->assertSee('المبلغ كتابةً', false)
+        ->assertSee('فقط خمسة وسبعون دولارا لا غير', false)
+        ->assertSee('/images/logo.png', false)
         ->assertSee('IBM Plex Sans Arabic', false)
         ->assertSee('/fonts/IBMPlexSansArabic-Regular.ttf', false)
         ->assertSee('window.print()', false);
@@ -506,22 +482,16 @@ test('posted payment receipt print uses uploaded logo when present', function ()
     Storage::fake('public');
 
     $admin = User::factory()->administrator()->create();
-    $invoice = SalesInvoice::factory()->posted($admin)->create();
 
     $settings = SystemSetting::current();
     $path = UploadedFile::fake()->image('brand.png')->store('logos', 'public');
     $settings->update(['logo_path' => $path]);
 
-    $posted = PaymentReceipt::factory()->posted($admin)->create();
-    PaymentReceiptAllocation::factory()->create([
-        'payment_receipt_id' => $posted->id,
-        'sales_invoice_id' => $invoice->id,
-        'amount' => 50,
-    ]);
+    $posted = PaymentReceipt::factory()->posted($admin)->create(['amount' => 50]);
 
     $this->actingAs($admin)
         ->get(route('payment-receipts.print', $posted))
         ->assertSuccessful()
         ->assertSee(Storage::disk('public')->url($path), false)
-        ->assertDontSee('/images/sdsm-logo.png', false);
+        ->assertDontSee('/images/logo.png', false);
 });

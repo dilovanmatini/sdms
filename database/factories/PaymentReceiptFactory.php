@@ -25,6 +25,7 @@ class PaymentReceiptFactory extends Factory
             'receipt_date' => fake()->date(),
             'distributor_id' => Distributor::factory(),
             'payment_method' => fake()->randomElement(PaymentMethod::cases()),
+            'amount' => fake()->randomFloat(2, 10, 1000),
             'notes' => fake()->optional()->sentence(),
             'status' => DocumentStatus::Draft,
         ];
@@ -51,9 +52,13 @@ class PaymentReceiptFactory extends Factory
     public function withAllocations(int $count = 1): static
     {
         return $this->afterCreating(function (PaymentReceipt $receipt) use ($count): void {
-            PaymentReceiptAllocation::factory()
+            $allocations = PaymentReceiptAllocation::factory()
                 ->count($count)
                 ->create(['payment_receipt_id' => $receipt->id]);
+
+            $receipt->update([
+                'amount' => number_format((float) $allocations->sum('amount'), 2, '.', ''),
+            ]);
         });
     }
 }

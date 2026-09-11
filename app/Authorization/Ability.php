@@ -14,6 +14,7 @@ enum Ability: string
     case ManagePurchases = 'manage_purchases';
     case ViewInventory = 'view_inventory';
     case ManageSales = 'manage_sales';
+    case ManageOpeningBalances = 'manage_opening_balances';
     case ManageReceipts = 'manage_receipts';
     case ViewStatements = 'view_statements';
     case ViewReports = 'view_reports';

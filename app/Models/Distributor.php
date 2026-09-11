@@ -45,6 +45,14 @@ class Distributor extends Model
     }
 
     /**
+     * @return HasMany<OpeningBalance, $this>
+     */
+    public function openingBalances(): HasMany
+    {
+        return $this->hasMany(OpeningBalance::class);
+    }
+
+    /**
      * @return HasMany<CustomerLedgerEntry, $this>
      */
     public function customerLedgerEntries(): HasMany

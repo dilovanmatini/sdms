@@ -5,6 +5,7 @@ namespace App\Actions\SalesInvoice;
 use App\Models\SalesInvoice;
 use App\Models\SalesInvoiceLine;
 use App\Models\SystemSetting;
+use App\Support\ArabicMoneyWords;
 use App\Support\MoneyDisplay;
 use App\Support\QuantityDisplay;
 use Illuminate\Http\Response;
@@ -25,6 +26,7 @@ class PrintAction
                 'subtotal' => MoneyDisplay::format($salesInvoice->subtotal, trim: true, thousands: true),
                 'discount' => MoneyDisplay::format($salesInvoice->discount, trim: true, thousands: true),
                 'grand_total' => MoneyDisplay::format($salesInvoice->grand_total, trim: true, thousands: true),
+                'grand_total_in_words' => ArabicMoneyWords::phrase($salesInvoice->grand_total),
                 'remaining_amount' => MoneyDisplay::format($salesInvoice->remainingAmount(), trim: true, thousands: true),
                 'status_label' => $salesInvoice->status->label(),
                 'distributor' => [

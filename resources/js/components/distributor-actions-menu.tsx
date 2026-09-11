@@ -7,6 +7,7 @@ import {
     ModalHeader,
 } from 'flowbite-react';
 import {
+    CircleDollarSign,
     EllipsisVertical,
     FileText,
     Pencil,
@@ -25,6 +26,7 @@ import {
 import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 import { createEdit as distributorsCreateEdit } from '@/routes/distributors';
+import { createEdit as openingBalancesCreateEdit } from '@/routes/opening-balances';
 import { createEdit as paymentReceiptsCreateEdit } from '@/routes/payment-receipts';
 import {
     createEdit as salesInvoicesCreateEdit,
@@ -79,6 +81,16 @@ export function distributorShortcuts(distributorId: number): Shortcut[] {
             ),
             icon: Wallet,
             ability: 'manage_receipts',
+        },
+        {
+            key: 'opening-balance',
+            label: 'مبلغ غير مسدد جديد',
+            href: openingBalancesCreateEdit.url(
+                {},
+                { query: { distributor_id: distributorId } },
+            ),
+            icon: CircleDollarSign,
+            ability: 'manage_opening_balances',
         },
         {
             key: 'statement',

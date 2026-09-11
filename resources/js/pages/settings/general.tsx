@@ -7,6 +7,7 @@ import {
     Select,
     Textarea,
     TextInput,
+    ToggleSwitch,
 } from 'flowbite-react';
 import { Settings2 } from 'lucide-react';
 import { useState } from 'react';
@@ -24,6 +25,7 @@ type Settings = {
     invoice_footer: string | null;
     receipt_header: string | null;
     receipt_footer: string | null;
+    show_dashboard_numbers: boolean;
 };
 
 type CurrencyOption = {
@@ -41,6 +43,9 @@ export default function GeneralSettings({ settings, currency_options }: Props) {
         settings.logo_url,
     );
     const [removeLogo, setRemoveLogo] = useState(false);
+    const [showDashboardNumbers, setShowDashboardNumbers] = useState(
+        settings.show_dashboard_numbers,
+    );
 
     return (
         <>
@@ -168,6 +173,42 @@ export default function GeneralSettings({ settings, currency_options }: Props) {
                                         </div>
                                     )}
                                     <InputError message={errors.remove_logo} />
+                                </div>
+                            </section>
+
+                            <section className="space-y-4">
+                                <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                                    الصفحة الرئيسية
+                                </h3>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="show_dashboard_numbers">
+                                        إظهار الأرقام
+                                    </Label>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                        القيمة الافتراضية لكل المستخدمين. يمكن
+                                        لكل مستخدم تغيير ذلك من زر الإظهار
+                                        والإخفاء في الصفحة الرئيسية.
+                                    </p>
+                                    <input
+                                        type="hidden"
+                                        name="show_dashboard_numbers"
+                                        value={showDashboardNumbers ? '1' : '0'}
+                                    />
+                                    <ToggleSwitch
+                                        id="show_dashboard_numbers"
+                                        checked={showDashboardNumbers}
+                                        color="default"
+                                        label={
+                                            showDashboardNumbers
+                                                ? 'ظاهرة'
+                                                : 'مخفية'
+                                        }
+                                        onChange={setShowDashboardNumbers}
+                                    />
+                                    <InputError
+                                        message={errors.show_dashboard_numbers}
+                                    />
                                 </div>
                             </section>
 

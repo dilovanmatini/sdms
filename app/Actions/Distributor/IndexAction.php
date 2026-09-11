@@ -20,7 +20,7 @@ class IndexAction
         $isActive = $this->activeStatusFilter($request);
 
         $distributors = Distributor::query()
-            ->withCount(['salesInvoices', 'paymentReceipts'])
+            ->withCount(['salesInvoices', 'paymentReceipts', 'openingBalances'])
             ->when($search !== '', function ($query) use ($search): void {
                 $query->where(function ($query) use ($search): void {
                     $query->where('name', 'like', "%{$search}%")
@@ -40,7 +40,8 @@ class IndexAction
                 'credit_limit' => $distributor->credit_limit,
                 'is_active' => $distributor->is_active,
                 'can_delete' => $distributor->sales_invoices_count === 0
-                    && $distributor->payment_receipts_count === 0,
+                    && $distributor->payment_receipts_count === 0
+                    && $distributor->opening_balances_count === 0,
             ]);
 
         return Inertia::render('distributors/index', [

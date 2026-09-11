@@ -9,6 +9,7 @@ use App\Models\Concerns\Auditable;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -27,6 +28,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property string $password
  * @property UserRole $role
  * @property bool $is_active
+ * @property bool|null $show_dashboard_numbers
  * @property string|null $two_factor_secret
  * @property string|null $two_factor_recovery_codes
  * @property Carbon|null $two_factor_confirmed_at
@@ -38,7 +40,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  */
-#[Fillable(['name', 'username', 'email', 'password', 'role', 'is_active'])]
+#[Fillable(['name', 'username', 'email', 'password', 'role', 'is_active', 'show_dashboard_numbers'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements PasskeyUser
 {
@@ -57,6 +59,31 @@ class User extends Authenticatable implements PasskeyUser
             'role' => UserRole::class,
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Null means inherit the general settings default.
+     *
+     * @return Attribute<bool|null, bool|null>
+     */
+    protected function showDashboardNumbers(): Attribute
+    {
+        return Attribute::make(
+            get: function (mixed $value): ?bool {
+                if ($value === null) {
+                    return null;
+                }
+
+                return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            },
+            set: function (?bool $value): ?int {
+                if ($value === null) {
+                    return null;
+                }
+
+                return $value ? 1 : 0;
+            },
+        );
     }
 
     public function hasAbility(Ability|string $ability): bool

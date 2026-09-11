@@ -32,7 +32,8 @@ test('payment receipt create prefills distributor from query string', function (
             ->component('payment-receipts/create-edit')
             ->where('receipt', null)
             ->where('selected_distributor.value', $distributor->id)
-            ->where('selected_distributor.label', 'موزع السند'));
+            ->where('selected_distributor.label', 'موزع السند')
+            ->where('selected_distributor.meta.balance', '0.00'));
 });
 
 test('distributor lookup includes contact meta for quick search', function () {
@@ -52,8 +53,25 @@ test('distributor lookup includes contact meta for quick search', function () {
             'meta' => [
                 'contact_person' => 'أحمد',
                 'phone' => '07501234567',
+                'balance' => '0.00',
             ],
         ]);
+});
+
+test('opening balance create prefills distributor from query string', function () {
+    $admin = User::factory()->administrator()->create();
+    $distributor = Distributor::factory()->create(['name' => 'موزع الرصيد السابق']);
+
+    $this->actingAs($admin)
+        ->get(route('opening-balances.create-edit', [
+            'distributor_id' => $distributor->id,
+        ]))
+        ->assertSuccessful()
+        ->assertInertia(fn ($page) => $page
+            ->component('opening-balances/create-edit')
+            ->where('opening_balance', null)
+            ->where('selected_distributor.value', $distributor->id)
+            ->where('selected_distributor.label', 'موزع الرصيد السابق'));
 });
 
 test('create pages ignore unknown distributor query ids', function () {

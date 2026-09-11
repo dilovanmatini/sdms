@@ -4,6 +4,7 @@ use App\Enums\LedgerReferenceType;
 use App\Enums\UserRole;
 use App\Models\CustomerLedgerEntry;
 use App\Models\Distributor;
+use App\Models\OpeningBalance;
 use App\Models\PaymentReceipt;
 use App\Models\SalesInvoice;
 use App\Models\User;
@@ -124,6 +125,37 @@ test('print and pdf endpoints return statement document', function () {
     expect($pdf)
         ->toStartWith('%PDF')
         ->toContain('IBMPlexSansArabic');
+});
+
+test('customer statement shows opening balance documents', function () {
+    $admin = User::factory()->administrator()->create();
+    $distributor = Distributor::factory()->create(['name' => 'موزع الذمم السابقة']);
+
+    $openingBalance = OpeningBalance::factory()->posted($admin)->create([
+        'distributor_id' => $distributor->id,
+        'number' => 'OPB-000333',
+        'amount' => 90,
+    ]);
+
+    CustomerLedgerEntry::factory()->create([
+        'distributor_id' => $distributor->id,
+        'entry_date' => '2026-01-01',
+        'reference_type' => LedgerReferenceType::OpeningBalance,
+        'reference_id' => $openingBalance->id,
+        'debit' => 90,
+        'credit' => 0,
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('statements.index', [
+            'distributor_id' => $distributor->id,
+        ]))
+        ->assertSuccessful()
+        ->assertInertia(fn ($page) => $page
+            ->where('statement.entries.0.type', 'opening_balance')
+            ->where('statement.entries.0.type_label', 'مبلغ غير مسدد')
+            ->where('statement.entries.0.reference_number', 'OPB-000333')
+            ->where('statement.closing_balance', '90.00 $'));
 });
 
 test('warehouse role cannot view statements', function () {

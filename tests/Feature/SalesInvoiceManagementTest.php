@@ -425,7 +425,9 @@ test('posted sales invoice can be printed and draft cannot', function () {
         ->assertSee('>100 $</td>', false)
         ->assertDontSee('50.00', false)
         ->assertDontSee('100.00', false)
-        ->assertSee('/images/sdsm-logo.png', false)
+        ->assertSee('المبلغ كتابةً', false)
+        ->assertSee('فقط مئة دولار لا غير', false)
+        ->assertSee('/images/logo.png', false)
         ->assertSee('IBM Plex Sans Arabic', false)
         ->assertSee('/fonts/IBMPlexSansArabic-Regular.ttf', false)
         ->assertSee('window.print()', false);
@@ -459,7 +461,7 @@ test('posted sales invoice print uses uploaded logo when present', function () {
         ->get(route('sales-invoices.print', $posted))
         ->assertSuccessful()
         ->assertSee(Storage::disk('public')->url($path), false)
-        ->assertDontSee('/images/sdsm-logo.png', false);
+        ->assertDontSee('/images/logo.png', false);
 });
 
 test('warehouse role cannot manage sales invoices', function () {

@@ -7,6 +7,7 @@ enum DocumentType: string
     case Purchase = 'PUR';
     case Invoice = 'INV';
     case Receipt = 'REC';
+    case OpeningBalance = 'OPB';
 
     public function prefix(): string
     {

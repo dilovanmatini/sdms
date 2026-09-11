@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Settings\BackupController;
 use App\Http\Controllers\Settings\GeneralSettingsController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
@@ -14,6 +15,15 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('settings/general', [GeneralSettingsController::class, 'edit'])->name('settings.general.edit');
     Route::put('settings/general', [GeneralSettingsController::class, 'update'])->name('settings.general.update');
+
+    Route::group(['prefix' => 'settings/backups'], function () {
+        Route::get('/', [BackupController::class, 'index'])->name('settings.backups.index');
+        Route::post('/', [BackupController::class, 'store'])
+            ->middleware('throttle:5,1')
+            ->name('settings.backups.store');
+        Route::get('{backup}/download', [BackupController::class, 'download'])->name('settings.backups.download');
+        Route::delete('{backup}', [BackupController::class, 'destroy'])->name('settings.backups.destroy');
+    });
 
     Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');

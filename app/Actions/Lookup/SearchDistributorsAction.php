@@ -3,6 +3,7 @@
 namespace App\Actions\Lookup;
 
 use App\Actions\Lookup\Concerns\ResolvesLookupSearch;
+use App\Models\CustomerLedgerEntry;
 use App\Models\Distributor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -39,6 +40,15 @@ class SearchDistributorsAction
             ->limit($limit)
             ->get(['id', 'name', 'contact_person', 'phone']);
 
+        $balances = $distributors->isEmpty()
+            ? collect()
+            : CustomerLedgerEntry::query()
+                ->whereIn('distributor_id', $distributors->modelKeys())
+                ->select('distributor_id')
+                ->selectRaw('COALESCE(SUM(debit), 0) - COALESCE(SUM(credit), 0) as balance')
+                ->groupBy('distributor_id')
+                ->pluck('balance', 'distributor_id');
+
         return response()->json([
             'data' => $distributors->map(fn (Distributor $distributor): array => [
                 'value' => $distributor->id,
@@ -46,6 +56,7 @@ class SearchDistributorsAction
                 'meta' => [
                     'contact_person' => $distributor->contact_person,
                     'phone' => $distributor->phone,
+                    'balance' => number_format((float) ($balances[$distributor->id] ?? 0), 2, '.', ''),
                 ],
             ])->values()->all(),
         ]);

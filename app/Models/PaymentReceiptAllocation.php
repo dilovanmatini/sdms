@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['payment_receipt_id', 'sales_invoice_id', 'amount'])]
+#[Fillable(['payment_receipt_id', 'sales_invoice_id', 'opening_balance_id', 'amount'])]
 class PaymentReceiptAllocation extends Model
 {
     /** @use HasFactory<PaymentReceiptAllocationFactory> */
@@ -39,5 +39,13 @@ class PaymentReceiptAllocation extends Model
     public function salesInvoice(): BelongsTo
     {
         return $this->belongsTo(SalesInvoice::class);
+    }
+
+    /**
+     * @return BelongsTo<OpeningBalance, $this>
+     */
+    public function openingBalance(): BelongsTo
+    {
+        return $this->belongsTo(OpeningBalance::class);
     }
 }

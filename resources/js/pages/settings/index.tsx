@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { Card } from 'flowbite-react';
-import { Ruler, Settings2, UserCog } from 'lucide-react';
+import { DatabaseBackup, Ruler, Settings2, UserCog } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { FormCard } from '@/components/form-card';
 import { toUrl } from '@/lib/utils';
@@ -19,6 +19,7 @@ type Props = {
 
 const iconByTitle: Record<string, LucideIcon> = {
     عام: Settings2,
+    'النسخ الاحتياطي': DatabaseBackup,
     'وحدات القياس': Ruler,
     المستخدمون: UserCog,
 };

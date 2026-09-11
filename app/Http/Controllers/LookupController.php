@@ -31,6 +31,7 @@ class LookupController extends Controller
         $this->authorizeLookup([
             Ability::ManageDistributors,
             Ability::ManageSales,
+            Ability::ManageOpeningBalances,
             Ability::ManageReceipts,
             Ability::ViewStatements,
         ]);

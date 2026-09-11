@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'receipt_date',
     'distributor_id',
     'payment_method',
+    'amount',
     'notes',
     'status',
     'posted_at',
@@ -38,6 +39,7 @@ class PaymentReceipt extends Model
             'receipt_date' => 'date',
             'posted_at' => 'datetime',
             'payment_method' => PaymentMethod::class,
+            'amount' => 'decimal:2',
             'status' => DocumentStatus::class,
         ];
     }

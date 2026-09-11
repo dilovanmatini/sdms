@@ -5,7 +5,8 @@ namespace App\Actions\PaymentReceipt;
 use App\Enums\PaymentMethod;
 use App\Models\Distributor;
 use App\Models\PaymentReceipt;
-use App\Models\PaymentReceiptAllocation;
+use App\Support\MoneyDisplay;
+use App\Support\PaymentReceiptBalanceSnapshot;
 use App\Support\QuantityDisplay;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,10 +14,16 @@ use Inertia\Response;
 
 class CreateEditAction
 {
+    public function __construct(private PaymentReceiptBalanceSnapshot $snapshot) {}
+
     public function handle(Request $request, ?PaymentReceipt $paymentReceipt): Response
     {
         if ($paymentReceipt?->exists) {
-            $paymentReceipt->load(['allocations.salesInvoice:id,number,grand_total', 'distributor:id,name']);
+            $paymentReceipt->load('distributor:id,name');
+
+            $snapshot = $paymentReceipt->isPosted()
+                ? $this->snapshot->forPosted($paymentReceipt)
+                : $this->snapshot->preview($paymentReceipt->distributor_id, $paymentReceipt->amount);
 
             return Inertia::render('payment-receipts/create-edit', [
                 'receipt' => [
@@ -25,55 +32,37 @@ class CreateEditAction
                     'receipt_date' => $paymentReceipt->receipt_date?->toDateString(),
                     'distributor_id' => $paymentReceipt->distributor_id,
                     'payment_method' => $paymentReceipt->payment_method->value,
+                    'amount' => QuantityDisplay::format($paymentReceipt->amount, 2),
                     'notes' => $paymentReceipt->notes,
                     'status' => $paymentReceipt->status->value,
                     'status_label' => $paymentReceipt->status->label(),
                     'is_posted' => $paymentReceipt->isPosted(),
                     'posted_at' => $paymentReceipt->posted_at?->toIso8601String(),
-                    'allocations' => $paymentReceipt->allocations->map(fn (PaymentReceiptAllocation $allocation): array => [
-                        'sales_invoice_id' => $allocation->sales_invoice_id,
-                        'amount' => QuantityDisplay::format($allocation->amount, 2),
-                        'invoice' => $allocation->salesInvoice?->only(['id', 'number', 'grand_total']),
-                    ])->values()->all(),
+                    'balance_before' => MoneyDisplay::format($snapshot['before'], trim: true),
+                    'balance_after' => MoneyDisplay::format($snapshot['after'], trim: true),
                 ],
                 'selected_distributor' => $paymentReceipt->distributor
                     ? [
                         'value' => $paymentReceipt->distributor->id,
                         'label' => $paymentReceipt->distributor->name,
+                        'meta' => [
+                            'balance' => $snapshot['before'],
+                        ],
                     ]
                     : null,
-                'selected_invoices' => $paymentReceipt->allocations
-                    ->map(function (PaymentReceiptAllocation $allocation): ?array {
-                        if ($allocation->salesInvoice === null) {
-                            return null;
-                        }
-
-                        return [
-                            'value' => $allocation->salesInvoice->id,
-                            'label' => $allocation->salesInvoice->number,
-                            'meta' => [
-                                'number' => $allocation->salesInvoice->number,
-                                'grand_total' => QuantityDisplay::format($allocation->salesInvoice->grand_total, 2),
-                                'remaining' => QuantityDisplay::format($allocation->amount, 2),
-                            ],
-                        ];
-                    })
-                    ->filter()
-                    ->unique('value')
-                    ->values()
-                    ->all(),
                 'payment_methods' => $this->paymentMethodOptions(),
                 'can_edit' => $paymentReceipt->isDraft(),
-                'can_post' => $paymentReceipt->isDraft() && $paymentReceipt->allocations->isNotEmpty(),
+                'can_post' => $paymentReceipt->isDraft() && bccomp((string) $paymentReceipt->amount, '0', 2) === 1,
                 'can_cancel' => $paymentReceipt->isPosted(),
                 'can_print' => $paymentReceipt->isPosted(),
             ]);
         }
 
+        $selectedDistributor = $this->selectedDistributorFromRequest($request);
+
         return Inertia::render('payment-receipts/create-edit', [
             'receipt' => null,
-            'selected_distributor' => $this->selectedDistributorFromRequest($request),
-            'selected_invoices' => [],
+            'selected_distributor' => $selectedDistributor,
             'payment_methods' => $this->paymentMethodOptions(),
             'can_edit' => true,
             'can_post' => false,
@@ -83,7 +72,7 @@ class CreateEditAction
     }
 
     /**
-     * @return array{value: int, label: string}|null
+     * @return array{value: int, label: string, meta: array{balance: string}}|null
      */
     private function selectedDistributorFromRequest(Request $request): ?array
     {
@@ -102,6 +91,9 @@ class CreateEditAction
         return [
             'value' => $distributor->id,
             'label' => $distributor->name,
+            'meta' => [
+                'balance' => number_format((float) $distributor->balance(), 2, '.', ''),
+            ],
         ];
     }
 

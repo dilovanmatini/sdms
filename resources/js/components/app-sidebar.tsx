@@ -2,6 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { Drawer, DrawerHeader, DrawerItems, Sidebar } from 'flowbite-react';
 import {
     ChartColumn,
+    CircleDollarSign,
     FileText,
     LayoutGrid,
     Menu,
@@ -29,6 +30,7 @@ import { dashboard } from '@/routes';
 import { index as categoriesIndex } from '@/routes/categories';
 import { index as distributorsIndex } from '@/routes/distributors';
 import { index as inventoryIndex } from '@/routes/inventory';
+import { index as openingBalancesIndex } from '@/routes/opening-balances';
 import { index as paymentReceiptsIndex } from '@/routes/payment-receipts';
 import { index as productsIndex } from '@/routes/products';
 import { index as purchasesIndex } from '@/routes/purchases';
@@ -111,6 +113,12 @@ const allNavGroups: NavGroup[] = [
                 href: paymentReceiptsIndex(),
                 icon: Wallet,
                 ability: 'manage_receipts',
+            },
+            {
+                title: 'المبالغ غير المسددة',
+                href: openingBalancesIndex(),
+                icon: CircleDollarSign,
+                ability: 'manage_opening_balances',
             },
             {
                 title: 'كشف حساب العميل',

@@ -33,7 +33,7 @@ test('service worker script exists for installability', function () {
 });
 
 test('root layout links the web app manifest', function () {
-    $this->get(route('home'))
+    $this->get(route('login'))
         ->assertOk()
         ->assertSee('rel="manifest"', false)
         ->assertSee('href="/manifest.json"', false)

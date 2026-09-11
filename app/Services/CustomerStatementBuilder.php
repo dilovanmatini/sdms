@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\LedgerReferenceType;
 use App\Models\CustomerLedgerEntry;
 use App\Models\Distributor;
+use App\Models\OpeningBalance;
 use App\Models\PaymentReceipt;
 use App\Models\SalesInvoice;
 use App\Support\MoneyDisplay;
@@ -130,6 +131,12 @@ class CustomerStatementBuilder
             ->unique()
             ->all();
 
+        $openingBalanceIds = $entries
+            ->where('reference_type', LedgerReferenceType::OpeningBalance)
+            ->pluck('reference_id')
+            ->unique()
+            ->all();
+
         return [
             LedgerReferenceType::Invoice->value => SalesInvoice::query()
                 ->whereIn('id', $invoiceIds)
@@ -137,6 +144,10 @@ class CustomerStatementBuilder
                 ->all(),
             LedgerReferenceType::Receipt->value => PaymentReceipt::query()
                 ->whereIn('id', $receiptIds)
+                ->pluck('number', 'id')
+                ->all(),
+            LedgerReferenceType::OpeningBalance->value => OpeningBalance::query()
+                ->whereIn('id', $openingBalanceIds)
                 ->pluck('number', 'id')
                 ->all(),
         ];

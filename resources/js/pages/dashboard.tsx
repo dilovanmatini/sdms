@@ -1,5 +1,6 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
+    Button,
     Card,
     Table,
     TableBody,
@@ -9,17 +10,23 @@ import {
     TableRow,
 } from 'flowbite-react';
 import {
+    Eye,
+    EyeOff,
     LayoutDashboard,
     Package,
     ShoppingCart,
     Users,
     Wallet,
 } from 'lucide-react';
+import { useState } from 'react';
+import DashboardController from '@/actions/App/Http/Controllers/DashboardController';
 import { FormCard } from '@/components/form-card';
 import { toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import { createEdit as paymentReceiptsCreateEdit } from '@/routes/payment-receipts';
 import { createEdit as salesInvoicesCreateEdit } from '@/routes/sales-invoices';
+
+const HIDDEN_VALUE = '••••••';
 
 type Metrics = {
     current_inventory_units: string;
@@ -46,13 +53,23 @@ type Metrics = {
 
 type Props = {
     metrics: Metrics;
+    show_dashboard_numbers: boolean;
 };
 
-export default function Dashboard({ metrics }: Props) {
+function displayFigure(value: string, visible: boolean): string {
+    return visible ? value : HIDDEN_VALUE;
+}
+
+export default function Dashboard({ metrics, show_dashboard_numbers }: Props) {
+    const [processing, setProcessing] = useState(false);
+
     const cards = [
         {
             title: 'المخزون الحالي',
-            value: metrics.current_inventory_units,
+            value: displayFigure(
+                metrics.current_inventory_units,
+                show_dashboard_numbers,
+            ),
             hint: 'إجمالي الوحدات',
             icon: Package,
             iconClass:
@@ -60,7 +77,7 @@ export default function Dashboard({ metrics }: Props) {
         },
         {
             title: 'مبيعات اليوم',
-            value: metrics.today_sales,
+            value: displayFigure(metrics.today_sales, show_dashboard_numbers),
             hint: 'فواتير نشطة',
             icon: ShoppingCart,
             iconClass:
@@ -68,7 +85,7 @@ export default function Dashboard({ metrics }: Props) {
         },
         {
             title: 'مبيعات الشهر',
-            value: metrics.month_sales,
+            value: displayFigure(metrics.month_sales, show_dashboard_numbers),
             hint: 'فواتير نشطة',
             icon: ShoppingCart,
             iconClass:
@@ -76,7 +93,10 @@ export default function Dashboard({ metrics }: Props) {
         },
         {
             title: 'الذمم المستحقة',
-            value: metrics.outstanding_receivables,
+            value: displayFigure(
+                metrics.outstanding_receivables,
+                show_dashboard_numbers,
+            ),
             hint: 'أرصدة العملاء',
             icon: Wallet,
             iconClass:
@@ -84,7 +104,10 @@ export default function Dashboard({ metrics }: Props) {
         },
         {
             title: 'عدد العملاء',
-            value: String(metrics.total_customers),
+            value: displayFigure(
+                String(metrics.total_customers),
+                show_dashboard_numbers,
+            ),
             hint: 'الموزعون',
             icon: Users,
             iconClass:
@@ -92,13 +115,35 @@ export default function Dashboard({ metrics }: Props) {
         },
         {
             title: 'عدد المنتجات',
-            value: String(metrics.total_products),
+            value: displayFigure(
+                String(metrics.total_products),
+                show_dashboard_numbers,
+            ),
             hint: 'في النظام',
             icon: Package,
             iconClass:
                 'bg-rose-50 text-rose-700 dark:bg-gray-700 dark:text-rose-300',
         },
     ];
+
+    const toggleNumbersVisibility = () => {
+        const next = !show_dashboard_numbers;
+
+        setProcessing(true);
+
+        router.patch(
+            DashboardController.updateNumbersVisibility.url(),
+            { show_dashboard_numbers: next },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                optimistic: () => ({
+                    show_dashboard_numbers: next,
+                }),
+                onFinish: () => setProcessing(false),
+            },
+        );
+    };
 
     return (
         <>
@@ -107,6 +152,30 @@ export default function Dashboard({ metrics }: Props) {
                 title="الصفحة الرئيسية"
                 description="ملخص المخزون والمبيعات والذمم"
                 icon={LayoutDashboard}
+                actions={
+                    <Button
+                        type="button"
+                        color="light"
+                        disabled={processing}
+                        onClick={toggleNumbersVisibility}
+                        aria-pressed={show_dashboard_numbers}
+                        aria-label={
+                            show_dashboard_numbers
+                                ? 'إخفاء الأرقام'
+                                : 'إظهار الأرقام'
+                        }
+                        className="inline-flex items-center gap-2"
+                    >
+                        {show_dashboard_numbers ? (
+                            <EyeOff className="h-4 w-4" aria-hidden />
+                        ) : (
+                            <Eye className="h-4 w-4" aria-hidden />
+                        )}
+                        {show_dashboard_numbers
+                            ? 'إخفاء الأرقام'
+                            : 'إظهار الأرقام'}
+                    </Button>
+                }
             >
                 <div className="space-y-6">
                     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -199,7 +268,10 @@ export default function Dashboard({ metrics }: Props) {
                                                             '—'}
                                                     </TableCell>
                                                     <TableCell className="text-end tabular-nums">
-                                                        {sale.grand_total}
+                                                        {displayFigure(
+                                                            sale.grand_total,
+                                                            show_dashboard_numbers,
+                                                        )}
                                                     </TableCell>
                                                 </TableRow>
                                             ))
@@ -275,9 +347,10 @@ export default function Dashboard({ metrics }: Props) {
                                                                 '—'}
                                                         </TableCell>
                                                         <TableCell className="text-end tabular-nums">
-                                                            {
-                                                                payment.total_amount
-                                                            }
+                                                            {displayFigure(
+                                                                payment.total_amount,
+                                                                show_dashboard_numbers,
+                                                            )}
                                                         </TableCell>
                                                     </TableRow>
                                                 ),

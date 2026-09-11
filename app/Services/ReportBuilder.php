@@ -242,7 +242,6 @@ class ReportBuilder
 
         $rows = PaymentReceipt::query()
             ->with('distributor:id,name')
-            ->withSum('allocations as total_amount', 'amount')
             ->where('status', DocumentStatus::Posted)
             ->when($fromDate !== null, fn ($query) => $query->whereDate('receipt_date', '>=', $fromDate))
             ->when($toDate !== null, fn ($query) => $query->whereDate('receipt_date', '<=', $toDate))
@@ -254,7 +253,7 @@ class ReportBuilder
                 'receipt_date' => $receipt->receipt_date?->toDateString(),
                 'distributor' => $receipt->distributor?->name,
                 'payment_method' => $receipt->payment_method->label(),
-                'total_amount' => MoneyDisplay::format($receipt->total_amount ?? 0),
+                'total_amount' => MoneyDisplay::format($receipt->amount ?? 0),
             ])
             ->all();
 

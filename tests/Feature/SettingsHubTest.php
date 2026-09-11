@@ -11,10 +11,11 @@ test('settings hub is reachable and shows system cards only', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('settings/index')
-            ->has('cards', 3)
+            ->has('cards', 4)
             ->where('cards.0.title', 'عام')
-            ->where('cards.1.title', 'وحدات القياس')
-            ->where('cards.2.title', 'المستخدمون')
+            ->where('cards.1.title', 'النسخ الاحتياطي')
+            ->where('cards.2.title', 'وحدات القياس')
+            ->where('cards.3.title', 'المستخدمون')
             ->where('cards', fn ($cards) => collect($cards)->contains('title', 'الملف الشخصي') === false));
 });
 

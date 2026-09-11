@@ -21,6 +21,12 @@ class IndexAction
                 'ability' => Ability::ManageSettings->value,
             ],
             [
+                'title' => 'النسخ الاحتياطي',
+                'description' => 'إنشاء وتنزيل نسخ احتياطية من قاعدة البيانات',
+                'href' => route('settings.backups.index'),
+                'ability' => Ability::ManageSettings->value,
+            ],
+            [
                 'title' => 'وحدات القياس',
                 'description' => 'إدارة وحدات القياس المستخدمة في المنتجات',
                 'href' => route('units.index'),

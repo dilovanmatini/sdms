@@ -25,10 +25,11 @@ class StoreUpdateAction
                     'receipt_date' => $data['receipt_date'],
                     'distributor_id' => $data['distributor_id'],
                     'payment_method' => $data['payment_method'],
+                    'amount' => $this->normalizedAmount($data['amount']),
                     'notes' => $data['notes'] ?? null,
                 ]);
 
-                $this->syncAllocations($paymentReceipt, $data['allocations']);
+                $paymentReceipt->allocations()->delete();
             });
 
             Inertia::flash('toast', ['type' => 'success', 'message' => 'تم تحديث سند القبض بنجاح.']);
@@ -39,18 +40,15 @@ class StoreUpdateAction
         $paymentReceipt = DB::transaction(function () use ($request): PaymentReceipt {
             $data = $request->validated();
 
-            $paymentReceipt = PaymentReceipt::query()->create([
+            return PaymentReceipt::query()->create([
                 'number' => $this->numbers->generate(DocumentType::Receipt),
                 'receipt_date' => $data['receipt_date'],
                 'distributor_id' => $data['distributor_id'],
                 'payment_method' => $data['payment_method'],
+                'amount' => $this->normalizedAmount($data['amount']),
                 'notes' => $data['notes'] ?? null,
                 'status' => DocumentStatus::Draft,
             ]);
-
-            $this->syncAllocations($paymentReceipt, $data['allocations']);
-
-            return $paymentReceipt;
         });
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'تم إنشاء سند القبض بنجاح.']);
@@ -58,18 +56,8 @@ class StoreUpdateAction
         return to_route('payment-receipts.create-edit', $paymentReceipt);
     }
 
-    /**
-     * @param  list<array{sales_invoice_id: int, amount: numeric-string|float|int}>  $allocations
-     */
-    private function syncAllocations(PaymentReceipt $receipt, array $allocations): void
+    private function normalizedAmount(mixed $amount): string
     {
-        $receipt->allocations()->delete();
-
-        foreach ($allocations as $allocation) {
-            $receipt->allocations()->create([
-                'sales_invoice_id' => $allocation['sales_invoice_id'],
-                'amount' => number_format((float) $allocation['amount'], 2, '.', ''),
-            ]);
-        }
+        return number_format((float) $amount, 2, '.', '');
     }
 }

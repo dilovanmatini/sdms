@@ -51,5 +51,6 @@ test('dashboard shows aggregated kpis for authenticated users', function () {
             ->has('metrics.recent_sales', 1)
             ->where('metrics.recent_sales.0.grand_total', '120 $')
             ->where('metrics.recent_sales.0.id', fn ($id) => is_int($id) && $id > 0)
-            ->has('metrics.recent_payments'));
+            ->has('metrics.recent_payments')
+            ->where('show_dashboard_numbers', true));
 });

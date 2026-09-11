@@ -11,3 +11,8 @@ test('currency symbols are short display forms', function () {
     expect(Currency::Usd->symbol())->toBe('$')
         ->and(Currency::Iqd->symbol())->toBe('د.ع');
 });
+
+test('currency iso codes match money spelling', function () {
+    expect(Currency::Usd->isoCode())->toBe('USD')
+        ->and(Currency::Iqd->isoCode())->toBe('IQD');
+});

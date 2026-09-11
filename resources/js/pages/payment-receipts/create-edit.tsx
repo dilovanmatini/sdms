@@ -2,7 +2,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { Button, Label, Select, Textarea, TextInput } from 'flowbite-react';
 import { Edit, Printer, Wallet } from 'lucide-react';
 import type { FormEvent } from 'react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import PaymentReceiptController from '@/actions/App/Http/Controllers/PaymentReceiptController';
 import { AsyncSearchableSelect } from '@/components/async-searchable-select';
 import type { SearchableSelectOption } from '@/components/async-searchable-select';
@@ -10,9 +10,8 @@ import { ConfirmActionButton } from '@/components/confirm-action-button';
 import { DocumentStatusBadge } from '@/components/document-status-badge';
 import { FormActions, FormCard } from '@/components/form-card';
 import InputError from '@/components/input-error';
-import { ReceiptAllocationsEditor } from '@/components/receipt-allocations-editor';
-import type { ReceiptAllocationDraft } from '@/components/receipt-allocations-editor';
 import { lookupQuery } from '@/hooks/use-lookup-options';
+import { useCurrency, useFormatMoney } from '@/lib/money';
 import { distributors as distributorLookups } from '@/routes/lookups';
 import {
     createEdit,
@@ -27,22 +26,15 @@ type Props = {
         receipt_date: string | null;
         distributor_id: number;
         payment_method: string;
+        amount: string;
         notes: string | null;
         status: 'draft' | 'posted' | 'cancelled';
         status_label: string;
         is_posted: boolean;
-        allocations: Array<{
-            sales_invoice_id: number;
-            amount: string;
-            invoice: {
-                id: number;
-                number: string;
-                grand_total: string;
-            } | null;
-        }>;
+        balance_before: string;
+        balance_after: string;
     } | null;
     selected_distributor: SearchableSelectOption | null;
-    selected_invoices: SearchableSelectOption[];
     payment_methods: Array<{ value: string; label: string }>;
     can_edit: boolean;
     can_post: boolean;
@@ -54,20 +46,34 @@ type ReceiptForm = {
     receipt_date: string;
     distributor_id: string;
     payment_method: string;
+    amount: string;
     notes: string;
-    allocations: ReceiptAllocationDraft[];
 };
+
+function optionBalance(option: SearchableSelectOption | null): string | null {
+    const balance = option?.meta?.balance;
+
+    if (balance === undefined || balance === null || balance === '') {
+        return null;
+    }
+
+    return String(balance);
+}
 
 export default function PaymentReceiptsCreateEdit({
     receipt,
     selected_distributor,
-    selected_invoices,
     payment_methods,
     can_edit,
     can_post,
     can_cancel,
     can_print,
 }: Props) {
+    const formatMoney = useFormatMoney();
+    const { symbol } = useCurrency();
+    const [outstanding, setOutstanding] = useState<string | null>(
+        optionBalance(selected_distributor),
+    );
     const form = useForm<ReceiptForm>({
         receipt_date:
             receipt?.receipt_date ?? new Date().toISOString().slice(0, 10),
@@ -78,23 +84,23 @@ export default function PaymentReceiptsCreateEdit({
               : '',
         payment_method:
             receipt?.payment_method ?? payment_methods[0]?.value ?? 'cash',
+        amount: receipt?.amount ?? '',
         notes: receipt?.notes ?? '',
-        allocations: receipt
-            ? receipt.allocations.map((allocation) => ({
-                  sales_invoice_id: String(allocation.sales_invoice_id),
-                  amount: allocation.amount,
-                  grand_total: allocation.invoice?.grand_total,
-              }))
-            : [{ sales_invoice_id: '', amount: '' }],
     });
 
-    const invoiceIncludeIds = useMemo(
-        () =>
-            form.data.allocations
-                .map((allocation) => allocation.sales_invoice_id)
-                .filter(Boolean),
-        [form.data.allocations],
-    );
+    const remainingAfter = useMemo(() => {
+        if (outstanding === null) {
+            return null;
+        }
+
+        const paid = Number(form.data.amount);
+
+        if (Number.isNaN(paid) || form.data.amount === '') {
+            return outstanding;
+        }
+
+        return (Number(outstanding) - paid).toFixed(2);
+    }, [outstanding, form.data.amount]);
 
     const submit = (event: FormEvent) => {
         event.preventDefault();
@@ -130,7 +136,7 @@ export default function PaymentReceiptsCreateEdit({
                 description={
                     isEdit
                         ? receipt.number
-                        : 'إنشاء مسودة سند قبض وتوزيعه على الفواتير'
+                        : 'إنشاء مسودة سند قبض بمبلغ على حساب الموزع'
                 }
                 icon={isEdit ? Edit : Wallet}
                 actions={
@@ -190,39 +196,124 @@ export default function PaymentReceiptsCreateEdit({
                                         }),
                                     )
                                 }
-                                onChange={(value) => {
+                                onChange={(value, option) => {
                                     form.setData('distributor_id', value);
-                                    form.setData('allocations', [
-                                        { sales_invoice_id: '', amount: '' },
-                                    ]);
+                                    setOutstanding(
+                                        optionBalance(option ?? null),
+                                    );
                                 }}
                             />
                             <InputError message={form.errors.distributor_id} />
                         </div>
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="payment_method">طريقة الدفع</Label>
-                        <Select
-                            id="payment_method"
-                            value={form.data.payment_method}
-                            disabled={!can_edit}
-                            onChange={(event) =>
-                                form.setData(
-                                    'payment_method',
-                                    event.target.value,
-                                )
-                            }
-                            required
-                        >
-                            {payment_methods.map((method) => (
-                                <option key={method.value} value={method.value}>
-                                    {method.label}
-                                </option>
-                            ))}
-                        </Select>
-                        <InputError message={form.errors.payment_method} />
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div className="grid gap-2">
+                            <Label htmlFor="payment_method">طريقة الدفع</Label>
+                            <Select
+                                id="payment_method"
+                                value={form.data.payment_method}
+                                disabled={!can_edit}
+                                onChange={(event) =>
+                                    form.setData(
+                                        'payment_method',
+                                        event.target.value,
+                                    )
+                                }
+                                required
+                            >
+                                {payment_methods.map((method) => (
+                                    <option
+                                        key={method.value}
+                                        value={method.value}
+                                    >
+                                        {method.label}
+                                    </option>
+                                ))}
+                            </Select>
+                            <InputError message={form.errors.payment_method} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="amount">المبلغ ({symbol})</Label>
+                            <TextInput
+                                id="amount"
+                                type="number"
+                                min="0.01"
+                                step="0.01"
+                                value={form.data.amount}
+                                disabled={!can_edit}
+                                required
+                                onChange={(event) =>
+                                    form.setData('amount', event.target.value)
+                                }
+                            />
+                            <InputError message={form.errors.amount} />
+                        </div>
                     </div>
+
+                    {receipt?.is_posted ? (
+                        <div className="grid gap-3 rounded-lg border border-gray-200 p-4 text-sm sm:grid-cols-3 dark:border-gray-700">
+                            <div className="grid gap-1">
+                                <span className="text-gray-500">
+                                    المبلغ السابق
+                                </span>
+                                <span className="font-medium tabular-nums">
+                                    {receipt.balance_before}
+                                </span>
+                            </div>
+                            <div className="grid gap-1">
+                                <span className="text-gray-500">
+                                    مبلغ السند
+                                </span>
+                                <span className="font-medium tabular-nums">
+                                    {formatMoney(receipt.amount)}
+                                </span>
+                            </div>
+                            <div className="grid gap-1">
+                                <span className="text-gray-500">
+                                    المبلغ المتبقي
+                                </span>
+                                <span className="font-medium tabular-nums">
+                                    {receipt.balance_after}
+                                </span>
+                            </div>
+                        </div>
+                    ) : (
+                        form.data.distributor_id !== '' &&
+                        outstanding !== null && (
+                            <div className="grid gap-3 rounded-lg border border-gray-200 p-4 text-sm sm:grid-cols-3 dark:border-gray-700">
+                                <div className="grid gap-1">
+                                    <span className="text-gray-500">
+                                        المبلغ السابق
+                                    </span>
+                                    <span className="font-medium tabular-nums">
+                                        {formatMoney(outstanding)}
+                                    </span>
+                                </div>
+                                <div className="grid gap-1">
+                                    <span className="text-gray-500">
+                                        مبلغ السند
+                                    </span>
+                                    <span className="font-medium tabular-nums">
+                                        {form.data.amount === ''
+                                            ? '—'
+                                            : formatMoney(form.data.amount)}
+                                    </span>
+                                </div>
+                                <div className="grid gap-1">
+                                    <span className="text-gray-500">
+                                        المبلغ المتبقي
+                                    </span>
+                                    <span className="font-medium tabular-nums">
+                                        {remainingAfter === null
+                                            ? '—'
+                                            : formatMoney(remainingAfter)}
+                                    </span>
+                                </div>
+                            </div>
+                        )
+                    )}
 
                     <div className="grid gap-2">
                         <Label htmlFor="notes">ملاحظات</Label>
@@ -237,18 +328,6 @@ export default function PaymentReceiptsCreateEdit({
                         />
                         <InputError message={form.errors.notes} />
                     </div>
-
-                    <ReceiptAllocationsEditor
-                        allocations={form.data.allocations}
-                        distributorId={form.data.distributor_id}
-                        selectedInvoices={selected_invoices}
-                        invoiceIncludeIds={invoiceIncludeIds}
-                        errors={form.errors}
-                        readOnly={!can_edit}
-                        onChange={(allocations) =>
-                            form.setData('allocations', allocations)
-                        }
-                    />
                 </form>
 
                 {can_edit && (

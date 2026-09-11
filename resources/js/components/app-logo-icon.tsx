@@ -1,7 +1,8 @@
 import { usePage } from '@inertiajs/react';
 import type { ImgHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
-import fallbackLogo from '../../images/sdsm-logo.png';
+
+const fallbackLogo = '/images/logo.png';
 
 type Props = Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt'> & {
     alt?: string;

@@ -16,9 +16,17 @@ use Illuminate\Support\Facades\Storage;
     'invoice_footer',
     'receipt_header',
     'receipt_footer',
+    'show_dashboard_numbers',
 ])]
 class SystemSetting extends Model
 {
+    /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'show_dashboard_numbers' => true,
+    ];
+
     public static function current(): self
     {
         return once(function (): self {
@@ -31,6 +39,7 @@ class SystemSetting extends Model
             return static::query()->create([
                 'app_name' => (string) config('app.name'),
                 'currency' => Currency::Usd,
+                'show_dashboard_numbers' => true,
             ]);
         });
     }
@@ -54,7 +63,7 @@ class SystemSetting extends Model
      */
     public function displayLogoUrl(): string
     {
-        return $this->logo_url ?? '/images/sdsm-logo.png';
+        return $this->logo_url ?? '/images/logo.png';
     }
 
     /**
@@ -64,6 +73,7 @@ class SystemSetting extends Model
     {
         return [
             'currency' => Currency::class,
+            'show_dashboard_numbers' => 'boolean',
         ];
     }
 }

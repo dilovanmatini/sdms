@@ -271,6 +271,19 @@
             line-height: 1.7;
         }
 
+        .amount-words {
+            margin-top: -12px;
+            margin-bottom: 28px;
+            padding: 10px 12px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            line-height: 1.7;
+        }
+
+        .amount-words strong {
+            margin-inline-end: 6px;
+        }
+
         @media print {
             .actions {
                 display: none;
@@ -338,34 +351,26 @@
         </table>
     </div>
 
-    <table class="lines">
-        <thead>
-            <tr>
-                <th class="col-index">#</th>
-                <th>رقم الفاتورة</th>
-                <th class="col-amount">المبلغ</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($receipt['allocations'] as $index => $allocation)
-                <tr>
-                    <td class="col-index">{{ $index + 1 }}</td>
-                    <td>
-                        <div class="line-name">{{ $allocation['invoice_number'] }}</div>
-                    </td>
-                    <td class="col-num">{{ $allocation['amount'] }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-
     <div class="summary-wrap">
         <table class="summary">
-            <tr class="total-row">
-                <td class="label">الإجمالي</td>
+            <tr>
+                <td class="label">المبلغ السابق</td>
+                <td class="value">{{ $receipt['balance_before'] }}</td>
+            </tr>
+            <tr>
+                <td class="label">مبلغ السند</td>
                 <td class="value">{{ $receipt['total_amount'] }}</td>
             </tr>
+            <tr class="total-row">
+                <td class="label">المبلغ المتبقي</td>
+                <td class="value">{{ $receipt['balance_after'] }}</td>
+            </tr>
         </table>
+    </div>
+
+    <div class="amount-words">
+        <strong>المبلغ كتابةً:</strong>
+        {{ $receipt['total_amount_in_words'] }}
     </div>
 
     @if ($receipt['notes'])

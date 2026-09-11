@@ -17,6 +17,7 @@ import { distributors as distributorLookups } from '@/routes/lookups';
 const LOOKUP_ABILITIES = [
     'manage_distributors',
     'manage_sales',
+    'manage_opening_balances',
     'manage_receipts',
     'view_statements',
 ] as const;

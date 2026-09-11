@@ -19,7 +19,6 @@ class PaymentReceiptCanceller
             $locked = PaymentReceipt::query()
                 ->whereKey($receipt->id)
                 ->lockForUpdate()
-                ->with('allocations')
                 ->firstOrFail();
 
             if ($locked->isCancelled()) {
@@ -30,11 +29,7 @@ class PaymentReceiptCanceller
                 throw new InvalidArgumentException('لا يمكن إلغاء إلا سند القبض النشط.');
             }
 
-            $totalAmount = '0';
-
-            foreach ($locked->allocations as $allocation) {
-                $totalAmount = bcadd($totalAmount, (string) $allocation->amount, 2);
-            }
+            $totalAmount = number_format((float) $locked->amount, 2, '.', '');
 
             CustomerLedgerEntry::query()->create([
                 'distributor_id' => $locked->distributor_id,

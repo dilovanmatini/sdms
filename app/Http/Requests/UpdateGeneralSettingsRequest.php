@@ -36,6 +36,10 @@ class UpdateGeneralSettingsRequest extends FormRequest
             $merged['remove_logo'] = $this->boolean('remove_logo');
         }
 
+        if ($this->has('show_dashboard_numbers')) {
+            $merged['show_dashboard_numbers'] = $this->boolean('show_dashboard_numbers');
+        }
+
         if ($merged !== []) {
             $this->merge($merged);
         }
@@ -55,6 +59,7 @@ class UpdateGeneralSettingsRequest extends FormRequest
             'invoice_footer' => ['nullable', 'string', 'max:5000'],
             'receipt_header' => ['nullable', 'string', 'max:5000'],
             'receipt_footer' => ['nullable', 'string', 'max:5000'],
+            'show_dashboard_numbers' => ['required', 'boolean'],
         ];
     }
 
@@ -72,6 +77,7 @@ class UpdateGeneralSettingsRequest extends FormRequest
             'invoice_footer' => 'تذييل الفاتورة',
             'receipt_header' => 'رأس السند',
             'receipt_footer' => 'تذييل السند',
+            'show_dashboard_numbers' => 'إظهار أرقام الصفحة الرئيسية',
         ];
     }
 }
