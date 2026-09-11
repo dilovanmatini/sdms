@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Process;
+use Illuminate\Validation\Rules\Password;
 
 test('artisan package discover works without a sqlite database file', function () {
     $missingPath = sys_get_temp_dir().'/sdms-missing-'.uniqid('', true).'.sqlite';
@@ -21,4 +22,10 @@ test('artisan package discover works without a sqlite database file', function (
     expect($result->successful())->toBeTrue(
         "package:discover failed:\n{$result->errorOutput()}\n{$result->output()}"
     );
+});
+
+test('production password defaults require only a minimum of six characters', function () {
+    $this->app['env'] = 'production';
+
+    expect(Password::defaults()->toPasswordRulesString())->toBe('minlength: 6;');
 });
