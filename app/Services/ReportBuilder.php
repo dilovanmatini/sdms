@@ -65,7 +65,7 @@ class ReportBuilder
         $columns = [
             ['key' => 'code', 'label' => 'الرمز'],
             ['key' => 'name_ar', 'label' => 'المنتج'],
-            ['key' => 'category', 'label' => 'الصنف'],
+            ['key' => 'category', 'label' => 'گروپ'],
             ['key' => 'unit', 'label' => 'الوحدة'],
             ['key' => 'available_quantity', 'label' => 'الكمية المتاحة'],
         ];

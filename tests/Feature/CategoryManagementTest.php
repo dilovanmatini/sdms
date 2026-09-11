@@ -1,6 +1,8 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Http\Requests\StoreUpdateCategoryRequest;
+use App\Http\Requests\StoreUpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
@@ -56,6 +58,11 @@ test('administrator can manage categories', function () {
         'name' => 'مشروبات محدثة',
         'is_active' => false,
     ]);
+});
+
+test('category and product forms label the group field as group', function () {
+    expect((new StoreUpdateCategoryRequest)->attributes()['name'])->toBe('اسم گروپ')
+        ->and((new StoreUpdateProductRequest)->attributes()['category_id'])->toBe('گروپ');
 });
 
 test('sales role cannot manage categories', function () {

@@ -19,13 +19,13 @@ type Props = {
 export default function CategoriesCreateEdit({ category }: Props) {
     return (
         <>
-            <Head title={category ? 'تعديل صنف' : 'إضافة صنف'} />
+            <Head title={category ? 'تعديل گروپ' : 'إضافة گروپ'} />
             <FormCard
-                title={category ? 'تعديل صنف' : 'إضافة صنف'}
+                title={category ? 'تعديل گروپ' : 'إضافة گروپ'}
                 description={
                     category
                         ? category.name
-                        : 'إنشاء صنف منتج جديد وتنظيم المنتجات ضمن مجموعة واضحة'
+                        : 'إنشاء گروپ منتج جديد وتنظيم المنتجات ضمن مجموعة واضحة'
                 }
                 icon={category ? Edit : Tags}
             >
@@ -37,7 +37,7 @@ export default function CategoriesCreateEdit({ category }: Props) {
                         <>
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="name">اسم الصنف</Label>
+                                    <Label htmlFor="name">اسم گروپ</Label>
                                     <TextInput
                                         id="name"
                                         name="name"
@@ -76,7 +76,7 @@ export default function CategoriesCreateEdit({ category }: Props) {
                                 }
                             >
                                 <Button type="submit" disabled={processing}>
-                                    {category ? 'حفظ التعديلات' : 'إنشاء الصنف'}
+                                    {category ? 'حفظ التعديلات' : 'إنشاء گروپ'}
                                 </Button>
                             </FormActions>
                         </>
@@ -89,7 +89,7 @@ export default function CategoriesCreateEdit({ category }: Props) {
 
 CategoriesCreateEdit.layout = ({ category }: Props) => ({
     breadcrumbs: [
-        { title: 'الأصناف', href: index() },
+        { title: 'گروپ', href: index() },
         category
             ? { title: 'تعديل', href: createEdit(category) }
             : { title: 'إضافة', href: createEdit() },

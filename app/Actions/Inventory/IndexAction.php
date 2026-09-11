@@ -22,10 +22,10 @@ class IndexAction
         $validated = $request->validate([
             'search' => ['nullable', 'string'],
             'category_id' => ['nullable', 'integer', 'exists:categories,id'],
-            'stock' => ['nullable', 'string', Rule::in(['in_stock', 'out_of_stock'])],
+            'stock' => ['nullable', 'string', Rule::in(['all', 'in_stock', 'out_of_stock'])],
         ], [], [
             'search' => 'البحث',
-            'category_id' => 'الصنف',
+            'category_id' => 'گروپ',
             'stock' => 'حالة المخزون',
         ]);
 
@@ -33,7 +33,9 @@ class IndexAction
         $categoryId = isset($validated['category_id'])
             ? (int) $validated['category_id']
             : null;
-        $stock = (string) ($validated['stock'] ?? '');
+        $stock = filled($validated['stock'] ?? null)
+            ? (string) $validated['stock']
+            : 'in_stock';
 
         $products = Product::query()
             ->with(['category:id,name', 'unit:id,name,symbol'])
@@ -90,7 +92,7 @@ class IndexAction
                 'stock' => $stock,
             ],
             'stock_options' => [
-                ['value' => '', 'label' => 'كل الكميات'],
+                ['value' => 'all', 'label' => 'كل الكميات'],
                 ['value' => 'in_stock', 'label' => 'متوفر'],
                 ['value' => 'out_of_stock', 'label' => 'غير متوفر'],
             ],

@@ -34,6 +34,8 @@ test('users with view inventory can see stock quantities', function () {
         'quantity_out' => 0,
     ]);
 
+    Product::factory()->create(['name_ar' => 'منتج بدون مخزون']);
+
     $this->actingAs($admin)
         ->get(route('inventory.index'))
         ->assertSuccessful()
@@ -46,7 +48,7 @@ test('users with view inventory can see stock quantities', function () {
             ->where('products.data.1.name_ar', 'منتج كسري')
             ->where('filters.search', '')
             ->where('filters.category_id', null)
-            ->where('filters.stock', ''));
+            ->where('filters.stock', 'in_stock'));
 });
 
 test('inventory can be filtered by search category and stock status', function () {
@@ -88,10 +90,22 @@ test('inventory can be filtered by search category and stock status', function (
         ->get(route('inventory.index', ['category_id' => $dairy->id]))
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
-            ->has('products.data', 2)
+            ->has('products.data', 1)
             ->where('filters.category_id', $dairy->id)
+            ->where('filters.stock', 'in_stock')
             ->where('selected_category.value', $dairy->id)
             ->where('selected_category.label', 'ألبان')
+            ->where('products.data.0.id', $inStockDairy->id));
+
+    $this->actingAs($admin)
+        ->get(route('inventory.index', [
+            'category_id' => $dairy->id,
+            'stock' => 'all',
+        ]))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('products.data', 2)
+            ->where('filters.stock', 'all')
             ->where('products.data.0.id', $outOfStockDairy->id)
             ->where('products.data.1.id', $inStockDairy->id));
 

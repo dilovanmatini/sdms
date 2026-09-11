@@ -43,10 +43,10 @@ export default function CategoriesIndex({
 }: Props) {
     return (
         <>
-            <Head title="الأصناف" />
+            <Head title="گروپ" />
             <FormCard
-                title="الأصناف"
-                description="إدارة أصناف المنتجات وتنظيمها ضمن قائمة واحدة"
+                title="گروپ"
+                description="إدارة گروپ المنتجات وتنظيمها ضمن قائمة واحدة"
                 icon={Tags}
                 actions={
                     <Button
@@ -55,7 +55,7 @@ export default function CategoriesIndex({
                         className="inline-flex items-center gap-2"
                     >
                         <Plus className="h-4 w-4" />
-                        إضافة صنف
+                        إضافة گروپ
                     </Button>
                 }
             >
@@ -106,7 +106,7 @@ export default function CategoriesIndex({
                                             colSpan={5}
                                             className="py-10 text-center text-gray-500"
                                         >
-                                            لا توجد أصناف
+                                            لا يوجد گروپ
                                         </TableCell>
                                     </TableRow>
                                 ) : (
@@ -175,5 +175,5 @@ export default function CategoriesIndex({
 }
 
 CategoriesIndex.layout = {
-    breadcrumbs: [{ title: 'الأصناف', href: index() }],
+    breadcrumbs: [{ title: 'گروپ', href: index() }],
 };

@@ -30,7 +30,7 @@ class StoreUpdateCategoryRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'اسم الصنف',
+            'name' => 'اسم گروپ',
             'description' => 'الوصف',
             'is_active' => 'الحالة',
         ];

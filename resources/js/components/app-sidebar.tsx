@@ -55,7 +55,7 @@ const allNavGroups: NavGroup[] = [
         title: 'المنتجات والمخزون',
         items: [
             {
-                title: 'الأصناف',
+                title: 'گروپ',
                 href: categoriesIndex(),
                 icon: Tags,
                 ability: 'manage_categories',

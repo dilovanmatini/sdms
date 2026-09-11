@@ -17,7 +17,7 @@ import { createEdit, index } from '@/routes/products';
 type Props = {
     product: {
         id: number;
-        code: string;
+        code: string | null;
         barcode: string | null;
         name_ar: string;
         category_id: number;
@@ -42,7 +42,7 @@ export default function ProductsCreateEdit({
                 description={
                     product
                         ? product.name_ar
-                        : 'إنشاء منتج جديد وتعريف رمزه وصنفه ووحدة قياسه'
+                        : 'إنشاء منتج جديد وتعريف رمزه وگروپه ووحدة قياسه'
                 }
                 icon={product ? Edit : Package}
             >
@@ -52,14 +52,24 @@ export default function ProductsCreateEdit({
                 >
                     {({ processing, errors }) => (
                         <>
+                            <div className="grid gap-2">
+                                <Label htmlFor="name_ar">الاسم العربي</Label>
+                                <TextInput
+                                    id="name_ar"
+                                    name="name_ar"
+                                    required
+                                    defaultValue={product?.name_ar}
+                                />
+                                <InputError message={errors.name_ar} />
+                            </div>
+
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div className="grid gap-2">
                                     <Label htmlFor="code">رمز المنتج</Label>
                                     <TextInput
                                         id="code"
                                         name="code"
-                                        required
-                                        defaultValue={product?.code}
+                                        defaultValue={product?.code ?? ''}
                                     />
                                     <InputError message={errors.code} />
                                 </div>
@@ -75,26 +85,15 @@ export default function ProductsCreateEdit({
                                 </div>
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="name_ar">الاسم العربي</Label>
-                                <TextInput
-                                    id="name_ar"
-                                    name="name_ar"
-                                    required
-                                    defaultValue={product?.name_ar}
-                                />
-                                <InputError message={errors.name_ar} />
-                            </div>
-
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="category_id">الصنف</Label>
+                                    <Label htmlFor="category_id">گروپ</Label>
                                     <AsyncSearchableSelect
                                         id="category_id"
                                         name="category_id"
                                         required
-                                        placeholder="اختر الصنف"
-                                        searchPlaceholder="ابحث عن صنف..."
+                                        placeholder="اختر گروپ"
+                                        searchPlaceholder="ابحث عن گروپ..."
                                         defaultValue={
                                             product?.category_id ?? ''
                                         }

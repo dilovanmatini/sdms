@@ -22,7 +22,7 @@ import { categories as categoryLookups } from '@/routes/lookups';
 
 type InventoryRow = {
     id: number;
-    code: string;
+    code: string | null;
     name_ar: string;
     unit: { id: number; name: string; symbol: string | null } | null;
     category: { id: number; name: string } | null;
@@ -47,7 +47,7 @@ type Props = {
 
 const allCategoriesOption: SearchableSelectOption = {
     value: '',
-    label: 'كل الأصناف',
+    label: 'كل گروپ',
 };
 
 export default function InventoryIndex({
@@ -111,13 +111,13 @@ export default function InventoryIndex({
                         />
                         <div className="w-full lg:max-w-xs">
                             <Label htmlFor="category_id" className="mb-2 block">
-                                الصنف
+                                گروپ
                             </Label>
                             <AsyncSearchableSelect
                                 id="category_id"
                                 name="category_id"
-                                placeholder="كل الأصناف"
-                                searchPlaceholder="ابحث عن صنف..."
+                                placeholder="كل گروپ"
+                                searchPlaceholder="ابحث عن گروپ..."
                                 value={categoryId}
                                 initialOptions={[
                                     allCategoriesOption,
@@ -152,7 +152,7 @@ export default function InventoryIndex({
                             >
                                 {stock_options.map((option) => (
                                     <option
-                                        key={option.value || 'all'}
+                                        key={option.value}
                                         value={option.value}
                                     >
                                         {option.label}
@@ -167,13 +167,13 @@ export default function InventoryIndex({
                             <TableHead>
                                 <TableRow>
                                     <TableHeadCell className="text-start">
-                                        الرمز
-                                    </TableHeadCell>
-                                    <TableHeadCell className="text-start">
                                         المنتج
                                     </TableHeadCell>
                                     <TableHeadCell className="text-start">
-                                        الصنف
+                                        الرمز
+                                    </TableHeadCell>
+                                    <TableHeadCell className="text-start">
+                                        گروپ
                                     </TableHeadCell>
                                     <TableHeadCell className="text-start">
                                         الوحدة
@@ -197,10 +197,10 @@ export default function InventoryIndex({
                                     products.data.map((product) => (
                                         <TableRow key={product.id}>
                                             <TableCell className="text-start font-medium">
-                                                {product.code}
+                                                {product.name_ar}
                                             </TableCell>
                                             <TableCell className="text-start">
-                                                {product.name_ar}
+                                                {product.code ?? '—'}
                                             </TableCell>
                                             <TableCell className="text-start">
                                                 {product.category?.name ?? '—'}

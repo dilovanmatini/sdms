@@ -24,9 +24,10 @@ class StoreUpdateProductRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        if ($this->barcode === '') {
-            $this->merge(['barcode' => null]);
-        }
+        $this->merge([
+            'code' => $this->code === '' ? null : $this->code,
+            'barcode' => $this->barcode === '' ? null : $this->barcode,
+        ]);
     }
 
     /**
@@ -41,7 +42,7 @@ class StoreUpdateProductRequest extends FormRequest
             : Rule::exists(Unit::class, 'id')->where('is_active', true);
 
         return [
-            'code' => ['required', 'string', 'max:50', Rule::unique(Product::class, 'code')->ignore($product?->id)],
+            'code' => ['nullable', 'string', 'max:50', Rule::unique(Product::class, 'code')->ignore($product?->id)],
             'barcode' => ['nullable', 'string', 'max:100', Rule::unique(Product::class, 'barcode')->ignore($product?->id)],
             'name_ar' => ['required', 'string', 'max:255'],
             'category_id' => ['required', 'integer', Rule::exists(Category::class, 'id')],
@@ -60,7 +61,7 @@ class StoreUpdateProductRequest extends FormRequest
             'code' => 'رمز المنتج',
             'barcode' => 'الباركود',
             'name_ar' => 'الاسم العربي',
-            'category_id' => 'الصنف',
+            'category_id' => 'گروپ',
             'unit_id' => 'وحدة القياس',
             'notes' => 'ملاحظات',
             'is_active' => 'الحالة',

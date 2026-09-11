@@ -93,6 +93,64 @@ test('accountant cannot manage products', function () {
         ->assertForbidden();
 });
 
+test('product code and barcode are optional', function () {
+    $admin = User::factory()->administrator()->create();
+    $category = Category::factory()->create();
+    $unit = Unit::factory()->create();
+
+    $this->actingAs($admin)
+        ->from(route('products.create-edit'))
+        ->post(route('products.store-update'), [
+            'name_ar' => 'منتج بدون رمز',
+            'category_id' => $category->id,
+            'unit_id' => $unit->id,
+            'notes' => null,
+            'is_active' => true,
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect();
+
+    $this->assertDatabaseHas('products', [
+        'name_ar' => 'منتج بدون رمز',
+        'code' => null,
+        'barcode' => null,
+    ]);
+
+    $this->actingAs($admin)
+        ->from(route('products.create-edit'))
+        ->post(route('products.store-update'), [
+            'code' => '',
+            'barcode' => '',
+            'name_ar' => 'منتج ثان بدون رمز',
+            'category_id' => $category->id,
+            'unit_id' => $unit->id,
+            'notes' => null,
+            'is_active' => true,
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect();
+
+    expect(Product::query()->whereNull('code')->count())->toBe(2);
+});
+
+test('product code must be unique when provided', function () {
+    $admin = User::factory()->administrator()->create();
+    $category = Category::factory()->create();
+    $unit = Unit::factory()->create();
+    Product::factory()->create(['code' => 'DUP-1']);
+
+    $this->actingAs($admin)
+        ->from(route('products.create-edit'))
+        ->post(route('products.store-update'), [
+            'code' => 'DUP-1',
+            'name_ar' => 'منتج مكرر',
+            'category_id' => $category->id,
+            'unit_id' => $unit->id,
+            'is_active' => true,
+        ])
+        ->assertSessionHasErrors('code');
+});
+
 test('unused product can be deleted', function () {
     $admin = User::factory()->administrator()->create();
     $product = Product::factory()->create();

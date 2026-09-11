@@ -47,7 +47,7 @@ class CreateEditAction
 
                         return [
                             'value' => $line->product->id,
-                            'label' => "{$line->product->code} — {$line->product->name_ar}",
+                            'label' => $line->product->selectionLabel(),
                         ];
                     })
                     ->filter()

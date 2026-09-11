@@ -12,7 +12,7 @@ class DestroyAction
     {
         $category->delete();
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'تم حذف الصنف بنجاح.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'تم حذف گروپ بنجاح.']);
 
         return to_route('categories.index');
     }

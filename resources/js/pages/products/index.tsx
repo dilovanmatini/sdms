@@ -23,7 +23,7 @@ import { createEdit, index } from '@/routes/products';
 
 type ProductRow = {
     id: number;
-    code: string;
+    code: string | null;
     barcode: string | null;
     name_ar: string;
     unit: { id: number; name: string; symbol: string | null } | null;
@@ -85,13 +85,13 @@ export default function ProductsIndex({
                             <TableHead>
                                 <TableRow>
                                     <TableHeadCell className="text-start">
-                                        الرمز
-                                    </TableHeadCell>
-                                    <TableHeadCell className="text-start">
                                         الاسم
                                     </TableHeadCell>
                                     <TableHeadCell className="text-start">
-                                        الصنف
+                                        الرمز
+                                    </TableHeadCell>
+                                    <TableHeadCell className="text-start">
+                                        گروپ
                                     </TableHeadCell>
                                     <TableHeadCell className="text-start">
                                         الوحدة
@@ -118,10 +118,10 @@ export default function ProductsIndex({
                                     products.data.map((product) => (
                                         <TableRow key={product.id}>
                                             <TableCell className="text-start font-medium">
-                                                {product.code}
+                                                {product.name_ar}
                                             </TableCell>
                                             <TableCell className="text-start">
-                                                {product.name_ar}
+                                                {product.code ?? '—'}
                                             </TableCell>
                                             <TableCell className="text-start">
                                                 {product.category?.name ?? '—'}

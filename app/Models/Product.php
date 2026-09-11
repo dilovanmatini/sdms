@@ -68,6 +68,13 @@ class Product extends Model
         return $this->hasMany(SalesInvoiceLine::class);
     }
 
+    public function selectionLabel(): string
+    {
+        return filled($this->code)
+            ? "{$this->code} — {$this->name_ar}"
+            : $this->name_ar;
+    }
+
     public function stockQuantity(): string
     {
         $result = $this->inventoryTransactions()

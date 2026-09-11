@@ -24,7 +24,25 @@ test('authorized users can search lookup endpoints', function () {
     $this->actingAs($admin)
         ->getJson(route('lookups.products', ['search' => 'بحث']))
         ->assertOk()
-        ->assertJsonFragment(['value' => $product->id]);
+        ->assertJsonFragment([
+            'value' => $product->id,
+            'label' => 'LK-1 — منتج بحث',
+        ]);
+
+    $productWithoutCode = Product::factory()->create([
+        'name_ar' => 'منتج بلا رمز',
+        'code' => null,
+        'category_id' => $category->id,
+        'unit_id' => $unit->id,
+    ]);
+
+    $this->actingAs($admin)
+        ->getJson(route('lookups.products', ['search' => 'بلا رمز']))
+        ->assertOk()
+        ->assertJsonFragment([
+            'value' => $productWithoutCode->id,
+            'label' => 'منتج بلا رمز',
+        ]);
 
     $this->actingAs($admin)
         ->getJson(route('lookups.suppliers', ['search' => 'بحث']))

@@ -41,7 +41,7 @@ type Props = {
             quantity: string;
             unit_price: string;
             line_total: string;
-            product: { id: number; code: string; name_ar: string } | null;
+            product: { id: number; code: string | null; name_ar: string } | null;
         }>;
     } | null;
     selected_distributor: SearchableSelectOption | null;

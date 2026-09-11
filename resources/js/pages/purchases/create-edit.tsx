@@ -28,7 +28,7 @@ type Props = {
         lines: Array<{
             product_id: number;
             quantity: string;
-            product: { id: number; code: string; name_ar: string } | null;
+            product: { id: number; code: string | null; name_ar: string } | null;
         }>;
     } | null;
     selected_supplier: SearchableSelectOption | null;

@@ -39,7 +39,7 @@ class SearchProductsAction
         return response()->json([
             'data' => $products->map(fn (Product $product): array => [
                 'value' => $product->id,
-                'label' => "{$product->code} — {$product->name_ar}",
+                'label' => $product->selectionLabel(),
             ])->values()->all(),
         ]);
     }

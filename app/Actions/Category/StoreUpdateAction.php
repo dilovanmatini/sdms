@@ -13,14 +13,14 @@ class StoreUpdateAction
         if ($category?->exists) {
             $category->update($request->validated());
 
-            Inertia::flash('toast', ['type' => 'success', 'message' => 'تم تحديث الصنف بنجاح.']);
+            Inertia::flash('toast', ['type' => 'success', 'message' => 'تم تحديث گروپ بنجاح.']);
 
             return to_route('categories.create-edit', $category);
         }
 
         $category = Category::query()->create($request->validated());
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'تم إنشاء الصنف بنجاح.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'تم إنشاء گروپ بنجاح.']);
 
         return to_route('categories.create-edit', $category);
     }
